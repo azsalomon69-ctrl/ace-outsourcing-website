@@ -19,4 +19,4 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: FRONTEND_ORIGIN
-        sync: false
+        value: https://ace-outsource.vercel.app
