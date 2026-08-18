@@ -2,7 +2,14 @@
 
 Audit date: August 18, 2026
 
-The deployed code contains no third-party npm runtime dependencies, JavaScript libraries, CSS frameworks, web-font files, videos, music, or stock-asset packages requiring bundled license text.
+The deployed code contains no third-party npm runtime dependencies, JavaScript libraries, CSS frameworks, videos, music, or stock-asset packages requiring bundled license text.
+
+The following Google Fonts are self-hosted by this website under the SIL Open Font License 1.1:
+
+- **Montserrat**, with its license preserved at `frontend/assets/fonts/Montserrat-OFL.txt`.
+- **Open Sans**, with its license preserved at `frontend/assets/fonts/OpenSans-OFL.txt`.
+
+The font files load from the ACE website itself. Visitors do not connect to Google merely to render these fonts.
 
 The site can connect to these external services:
 
@@ -12,4 +19,3 @@ The site can connect to these external services:
 - **Facebook** and **LinkedIn** through ordinary outbound links to ACE profiles.
 
 Names and logos belonging to clients, platforms, product manufacturers, and other organizations remain the property of their respective owners. Their appearance does not by itself indicate sponsorship or endorsement of ACE. Client logos, testimonials, ratings, and identities require separate permission as recorded in `ASSET-LICENSE-REGISTER.md`.
-

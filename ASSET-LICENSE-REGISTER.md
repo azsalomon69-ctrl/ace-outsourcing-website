@@ -26,7 +26,7 @@ This register records provenance known from the project history. It does not con
 | `frontend/assets/green-marketing.png` and the Shai A. testimonial | Client testimonial | User-supplied | Third-party mark and endorsement. Obtain and retain written permission for the logo, person’s name, company name, quotation, rating, and public endorsement. |
 | Text-only “f” and “in” social link glyphs | Links to ACE social profiles | Project-authored text treatment | No copied icon artwork is distributed. Facebook and LinkedIn names remain third-party trademarks and are used only to identify destination services. Do not imply platform endorsement. |
 | Google Street View embed | Optional location view | Google Maps embed loaded after visitor action | Google is a third-party service. Its own map interface supplies required attribution. Use is subject to Google’s applicable terms; no Google map imagery is copied into the repository. |
-| System font stack: Segoe UI, Arial, sans-serif | Typography | Visitor operating system | No font file is distributed by this project. Google Fonts and Manrope requests were removed. |
+| `frontend/assets/fonts/Montserrat-Variable.ttf`, `OpenSans-Variable.ttf`, and their `*-OFL.txt` files | Typography | Official Google Fonts repository | Self-hosted under the SIL Open Font License 1.1. Montserrat is used for headings and interface labels; Open Sans is used for body copy and forms. Preserve both included license files. No visitor request is sent to Google to load these fonts. |
 | `frontend/*.html`, `frontend/ace.css`, `frontend/*.js`, `backend/*.mjs` | Site and API code | Project-authored for ACE | Project-authored. No third-party JavaScript or CSS library was found. |
 | `backend/package.json`, `backend/package-lock.json` | Node runtime declaration | Project-authored | No npm runtime dependencies are installed. The backend uses Node.js built-in modules only. |
 
@@ -34,7 +34,7 @@ This register records provenance known from the project history. It does not con
 
 - Hotlinked employee photographs from `ace-outsourcing.com` were replaced with local user-supplied copies to avoid disclosing visitor requests to the old WordPress host.
 - Hotlinked WordPress hero and panel images were replaced with local ACE workplace images.
-- Google Fonts was removed, so no remote font license file or Google font request is part of the deployed site.
+- Montserrat and Open Sans are self-hosted with their SIL Open Font License files. No remote Google Fonts request is part of the deployed site.
 - No images were taken from Google Search, social media, or GitHub during this audit.
 
 ## Publication blockers to resolve internally
@@ -47,4 +47,3 @@ This register records provenance known from the project history. It does not con
 6. Store evidence of permissions and licenses in an internal system, not in this public repository.
 
 Until those checks are documented, the affected materials remain flagged rather than assumed safe.
-
