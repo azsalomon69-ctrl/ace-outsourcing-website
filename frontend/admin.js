@@ -1,0 +1,52 @@
+document.addEventListener('DOMContentLoaded',async()=>{
+  if(!window.ACECMS||!ACECMS.isSignedIn()){window.location.replace('login.html');return}
+  let content=await ACECMS.getContent(),editType='',editId='';
+  const editor=document.querySelector('[data-admin-editor]'),editorForm=document.querySelector('[data-admin-editor-form]'),fields=document.querySelector('[data-editor-fields]'),state=document.querySelector('[data-admin-state]');
+  const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  const imageOrFallback=(value,label)=>value?`<img src="${escapeHtml(value)}" alt="${escapeHtml(label)}">`:`<span class="admin-image-placeholder">No image</span>`;
+  const setState=message=>{state.textContent=message;state.classList.add('changed');setTimeout(()=>state.classList.remove('changed'),1600)};
+  const render=()=>{
+    document.querySelector('[data-admin-list="team"]').innerHTML=content.team.map((item,index)=>itemCard('team',item,index,item.name,item.role,item.image)).join('')||emptyState('people');
+    document.querySelector('[data-admin-list="testimonials"]').innerHTML=content.testimonials.map((item,index)=>itemCard('testimonials',item,index,item.company,item.name,item.logo)).join('')||emptyState('client stories');
+    document.querySelector('[data-admin-list="blogs"]').innerHTML=content.blogs.map((item,index)=>itemCard('blogs',item,index,item.title,`${item.category} · ${item.date}`,item.cover)).join('')||emptyState('blog posts');
+  };
+  const emptyState=label=>`<div class="admin-empty">No ${label} yet. Use the add button to create one.</div>`;
+  const itemCard=(type,item,index,title,subtitle,image)=>`<article class="admin-item" data-item-type="${type}" data-item-id="${escapeHtml(item.id)}"><div class="admin-item-image">${imageOrFallback(image,title)}</div><div class="admin-item-copy"><strong>${escapeHtml(title||'Untitled')}</strong><span>${escapeHtml(subtitle||'')}</span></div><div class="admin-item-actions"><button type="button" data-move="up" aria-label="Move up" ${index===0?'disabled':''}>↑</button><button type="button" data-move="down" aria-label="Move down" ${index===content[type].length-1?'disabled':''}>↓</button><button type="button" data-edit>Edit</button><button class="remove" type="button" data-remove>Remove</button></div></article>`;
+  const input=(label,name,value='',type='text',extra='')=>`<div class="field"><label for="editor-${name}">${label}</label><input id="editor-${name}" name="${name}" type="${type}" value="${escapeHtml(value)}" ${extra}></div>`;
+  const textarea=(label,name,value='',help='')=>`<div class="field full"><label for="editor-${name}">${label}</label><textarea id="editor-${name}" name="${name}">${escapeHtml(value)}</textarea>${help?`<small>${escapeHtml(help)}</small>`:''}</div>`;
+  const imageFields=(urlName,urlValue,uploadName,label,multiple=false)=>`${input(`${label} URL`,urlName,urlValue,'text','placeholder="assets/photo.png or https://..."')}<div class="field"><label for="editor-${uploadName}">${multiple?`Add ${label.toLowerCase()}`:`Upload new ${label.toLowerCase()}`}</label><input id="editor-${uploadName}" name="${uploadName}" type="file" accept="image/*" ${multiple?'multiple':''}><small>Images are resized before saving.</small></div>`;
+  const openEditor=(type,item=null)=>{
+    editType=type;editId=item?.id||'';
+    document.querySelector('[data-editor-kicker]').textContent=item?'Edit content':'New content';
+    document.querySelector('[data-editor-title]').textContent=type==='team'?(item?'Edit person':'Add person'):type==='testimonials'?(item?'Edit client story':'Add client story'):(item?'Edit blog post':'Add blog post');
+    if(type==='team')fields.innerHTML=`<div class="admin-editor-grid">${input('Name','name',item?.name,'text','required')}${input('Role','role',item?.role,'text','required')}${textarea('Quote','quote',item?.quote)}${imageFields('image',item?.image,'imageUpload','Profile image')}</div>`;
+    if(type==='testimonials')fields.innerHTML=`<div class="admin-editor-grid">${input('Client name','name',item?.name,'text','required')}${input('Company','company',item?.company,'text','required')}${input('Star rating','rating',item?.rating||5,'number','min="1" max="5" step="1" required')}${textarea('Testimonial','quote',item?.quote)}${imageFields('logo',item?.logo,'logoUpload','Company logo')}</div>`;
+    if(type==='blogs'){
+      const currentGallery=(item?.images||[]).map((source,index)=>`<label class="admin-gallery-edit-item"><img src="${escapeHtml(source)}" alt="Gallery image ${index+1}"><span><input type="checkbox" name="removeGallery" value="${index}"> Remove image</span></label>`).join('');
+      fields.innerHTML=`<div class="admin-editor-grid">${input('Post title','title',item?.title,'text','required')}${input('Category','category',item?.category||'Team culture','text','required')}${input('Author','author',item?.author||'ACE Team','text')}${input('Date','date',item?.date||new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),'text')}${textarea('Short summary','excerpt',item?.excerpt)}${textarea('Article body','body',item?.body,'Leave a blank line between paragraphs.')}${imageFields('cover',item?.cover,'coverUpload','Cover image')}${textarea('Add gallery image URLs','newImages','','One new image path or URL per line.')}<div class="field"><label for="editor-galleryUploads">Add gallery images</label><input id="editor-galleryUploads" name="galleryUploads" type="file" accept="image/*" multiple><small>Choose one or several images. They will be added to the gallery.</small></div><div class="field full"><label>Current gallery</label><div class="admin-gallery-manager">${currentGallery||'<p>No gallery images yet.</p>'}</div><small>Tick any picture you want removed, then save the post.</small></div></div>`;
+    }
+    editor.showModal();
+  };
+  const fileToDataUrl=file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(reader.error);reader.onload=()=>{const image=new Image();image.onerror=()=>resolve(reader.result);image.onload=()=>{const max=1600,scale=Math.min(1,max/Math.max(image.width,image.height)),canvas=document.createElement('canvas');canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);const type=file.type==='image/png'?'image/png':'image/jpeg';resolve(canvas.toDataURL(type,.84))};image.src=reader.result};reader.readAsDataURL(file)});
+  const save=async()=>{await ACECMS.saveContent(content);render();setState('Changes saved. Refresh the public page to see them.')};
+  document.querySelectorAll('[data-admin-tab]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-admin-tab]').forEach(item=>item.classList.toggle('active',item===button));document.querySelectorAll('[data-admin-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.adminPanel===button.dataset.adminTab))}));
+  document.querySelectorAll('[data-admin-add]').forEach(button=>button.addEventListener('click',()=>openEditor(button.dataset.adminAdd)));
+  document.addEventListener('click',async event=>{
+    const card=event.target.closest('.admin-item');if(!card)return;
+    const list=content[card.dataset.itemType],index=list.findIndex(item=>item.id===card.dataset.itemId);if(index<0)return;
+    if(event.target.closest('[data-edit]'))openEditor(card.dataset.itemType,list[index]);
+    if(event.target.closest('[data-remove]')&&confirm('Remove this item from the website?')){list.splice(index,1);await save()}
+    const move=event.target.closest('[data-move]')?.dataset.move,target=move==='up'?index-1:move==='down'?index+1:index;if(target!==index&&target>=0&&target<list.length){[list[index],list[target]]=[list[target],list[index]];await save()}
+  });
+  editorForm.addEventListener('submit',async event=>{
+    event.preventDefault();const data=new FormData(editorForm),current=content[editType].find(item=>item.id===editId)||{},record={...current,id:current.id||ACECMS.uid(editType.slice(0,-1)||'item')};
+    if(editType==='team'){record.name=data.get('name');record.role=data.get('role');record.quote=data.get('quote');record.image=data.get('image')||record.image||'';const file=data.get('imageUpload');if(file?.size)record.image=await fileToDataUrl(file)}
+    if(editType==='testimonials'){record.name=data.get('name');record.company=data.get('company');record.quote=data.get('quote');record.rating=Math.max(1,Math.min(5,Number(data.get('rating'))||5));record.logo=data.get('logo')||record.logo||'';const file=data.get('logoUpload');if(file?.size)record.logo=await fileToDataUrl(file)}
+    if(editType==='blogs'){record.title=data.get('title');record.category=data.get('category');record.author=data.get('author');record.date=data.get('date');record.excerpt=data.get('excerpt');record.body=data.get('body');record.cover=data.get('cover')||record.cover||'';const removed=new Set([...editorForm.querySelectorAll('[name="removeGallery"]:checked')].map(input=>Number(input.value)));record.images=(current.images||[]).filter((source,index)=>!removed.has(index));record.images.push(...String(data.get('newImages')||'').split(/\r?\n/).map(value=>value.trim()).filter(Boolean));const cover=data.get('coverUpload');if(cover?.size)record.cover=await fileToDataUrl(cover);const gallery=[...editorForm.querySelector('[name="galleryUploads"]').files];if(gallery.length)record.images.push(...await Promise.all(gallery.map(fileToDataUrl)));if(!record.images.length&&record.cover)record.images=[record.cover]}
+    const index=content[editType].findIndex(item=>item.id===record.id);if(index>=0)content[editType][index]=record;else content[editType].push(record);await save();editor.close();
+  });
+  document.querySelector('[data-editor-close]').addEventListener('click',()=>editor.close());document.querySelector('[data-editor-cancel]').addEventListener('click',()=>editor.close());
+  document.querySelector('[data-admin-logout]').addEventListener('click',()=>{ACECMS.signOut();window.location.replace('login.html')});
+  document.querySelector('[data-admin-reset]').addEventListener('click',async()=>{if(!confirm('Restore the original people, testimonials, and blog posts?'))return;content=await ACECMS.resetContent();render();setState('Original content restored.')});
+  render();
+});

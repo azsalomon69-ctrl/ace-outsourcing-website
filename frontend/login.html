@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Login | ACE Outsourcing Solutions</title>
+  <link rel="icon" type="image/png" href="assets/ACE.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ace.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <a class="login-brand" href="index.html">
+      <img src="assets/ACE.png" alt="ACE Outsourcing Solutions">
+      <span><strong>ACE Outsourcing</strong><span>Expert Service, Beyond Borders</span></span>
+    </a>
+    <span class="eyebrow">Admin access</span>
+    <h1 data-login-title>Welcome back.</h1>
+    <p class="login-intro" data-login-intro>Sign in to manage ACE website content.</p>
+    <form class="login-form" data-login-form>
+      <div class="field"><label for="admin-email">Email address</label><input id="admin-email" name="email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required></div>
+      <div class="field" data-confirm-field hidden><label for="admin-confirm">Confirm password</label><input id="admin-confirm" name="confirmPassword" type="password" autocomplete="new-password"></div>
+      <button class="btn btn-dark" type="submit" data-login-submit>Sign in</button>
+      <div class="form-status" data-login-status role="status"></div>
+    </form>
+    <a class="login-back" href="index.html">← Back to website</a>
+  </main>
+  <script src="cms.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>
