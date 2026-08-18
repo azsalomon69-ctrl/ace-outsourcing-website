@@ -75,7 +75,7 @@ function cookies(request){
 function sign(value){return createHmac('sha256',sessionSecret).update(value).digest('base64url')}
 function createSession(){
   const csrf=randomBytes(24).toString('base64url');
-  const payload=Buffer.from(JSON.stringify({email:adminEmail,csrf,expires:Date.now()+sessionHours*60*60*1000,nonce:randomBytes(16).toString('base64url')})).toString('base64url');
+  const payload=Buffer.from(JSON.stringify({csrf,expires:Date.now()+sessionHours*60*60*1000,nonce:randomBytes(16).toString('base64url')})).toString('base64url');
   return {token:`${payload}.${sign(payload)}`,csrf};
 }
 function verifySession(request){
@@ -86,11 +86,11 @@ function verifySession(request){
   const expected=Buffer.from(sign(payload));
   const actual=Buffer.from(signature);
   if(expected.length!==actual.length||!timingSafeEqual(expected,actual))return null;
-  try{const session=JSON.parse(Buffer.from(payload,'base64url').toString('utf8'));return session.email===adminEmail&&session.expires>Date.now()?session:null}catch{return null}
+  try{const session=JSON.parse(Buffer.from(payload,'base64url').toString('utf8'));return session.csrf&&session.expires>Date.now()?session:null}catch{return null}
 }
 function sessionCookie(token,maxAge=sessionHours*60*60){
-  const sameSite=production?'None':'Lax';
-  return `ace_session=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAge}${production?'; Secure':''}`;
+  const path=production?'/api':'/';
+  return `ace_session=${encodeURIComponent(token)}; Path=${path}; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${production?'; Secure':''}`;
 }
 function requireSession(request,response,csrf=false){
   const session=verifySession(request);
@@ -123,7 +123,7 @@ function normalizeContent(value){
   if(!value||typeof value!=='object'||!Array.isArray(value.team)||!Array.isArray(value.testimonials)||!Array.isArray(value.blogs))throw Object.assign(new Error('Invalid content structure.'),{status:400});
   if(value.team.length>100||value.testimonials.length>100||value.blogs.length>250)throw Object.assign(new Error('Content collection limit exceeded.'),{status:400});
   const cleanText=(input,max=20000)=>String(input??'').slice(0,max);
-  const cleanUrl=input=>{const value=cleanText(input,4*1024*1024);if(value.startsWith('data:image/')||value.startsWith('assets/')||/^https:\/\//i.test(value))return value;return ''};
+  const cleanUrl=input=>{const value=cleanText(input,4*1024*1024);if(/^data:image\/(png|jpeg|webp|gif);base64,/i.test(value)||value.startsWith('assets/'))return value;return ''};
   return {
     team:value.team.map(item=>({id:cleanText(item.id,100),name:cleanText(item.name,150),role:cleanText(item.role,150),quote:cleanText(item.quote,2000),image:cleanUrl(item.image)})),
     testimonials:value.testimonials.map(item=>({id:cleanText(item.id,100),name:cleanText(item.name,150),company:cleanText(item.company,200),quote:cleanText(item.quote,4000),logo:cleanUrl(item.logo),rating:Math.max(1,Math.min(5,Number(item.rating)||5))})),
@@ -195,4 +195,3 @@ const server=http.createServer(handler);
 server.requestTimeout=30_000;
 server.headersTimeout=15_000;
 server.listen(port,'0.0.0.0',()=>console.log(`ACE admin API listening on port ${port}`));
-

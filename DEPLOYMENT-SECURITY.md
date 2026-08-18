@@ -28,7 +28,7 @@ The production login is handled by the Render backend, not JavaScript stored in 
 
 - Accept login only over HTTPS.
 - Compare the submitted password against `ADMIN_PASSWORD_HASH` on the server.
-- Return an `HttpOnly` and `Secure` session cookie. The initial separate Vercel and Render domains require `SameSite=None`; CSRF protection and exact-origin CORS remain mandatory.
+- Return a signed `HttpOnly` and `Secure` session cookie through the same-origin Vercel `/api` proxy. Production uses `SameSite=Lax`, `Path=/api`, no `Domain` attribute, and an eight-hour maximum lifetime. CSRF protection remains mandatory.
 - Create a new signed session after login and expire it after the configured lifetime.
 - Apply login rate limits and temporary lockouts.
 - Require CSRF protection for every add, edit, delete, upload, and logout request.
@@ -42,7 +42,7 @@ The Render API URL is configured in `frontend/config.js`. Login and admin pages 
 
 ## API requirements
 
-- Vercel may contain only the public Render API base URL.
+- Vercel proxies `/api` to the public Render API address so the browser uses a first-party, path-scoped session cookie.
 - Render must allow CORS only from the exact `FRONTEND_ORIGIN`.
 - Use JSON body-size limits and validate every field on the server.
 - Allow image and CV uploads only after checking file type, file signature, and maximum size.

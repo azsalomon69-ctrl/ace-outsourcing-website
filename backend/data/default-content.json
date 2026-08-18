@@ -1,9 +1,9 @@
 {
   "team": [
-    {"id":"kristine-p","name":"Kristine P.","role":"Trainer","quote":"We don’t just train for the job. We train for growth.","image":"https://ace-outsourcing.com/wp-content/uploads/2024/12/download-5.jpeg"},
-    {"id":"ash-pampuan","name":"Ash Pampuan","role":"Team Leader","quote":"Every team member should feel valued, supported and heard.","image":"https://ace-outsourcing.com/wp-content/uploads/2024/12/ash.jpg"},
-    {"id":"rose-esc","name":"Rose Esc","role":"Web Developer","quote":"Innovation helps us improve operations and client satisfaction.","image":"https://ace-outsourcing.com/wp-content/uploads/2024/12/unnamed.jpg"},
-    {"id":"byron-tabbada","name":"Byron Tabbada","role":"Human Resources","quote":"We create a workplace where people feel respected and motivated to grow.","image":"https://ace-outsourcing.com/wp-content/uploads/2024/12/Byron.jpeg"}
+    {"id":"kristine-p","name":"Kristine P.","role":"Trainer","quote":"We don’t just train for the job. We train for growth.","image":"assets/team-kristine.png"},
+    {"id":"ash-pampuan","name":"Ash Pampuan","role":"Team Leader","quote":"Every team member should feel valued, supported and heard.","image":"assets/team-ash.png"},
+    {"id":"rose-esc","name":"Rose Esc","role":"Web Developer","quote":"Innovation helps us improve operations and client satisfaction.","image":"assets/team-rose.png"},
+    {"id":"byron-tabbada","name":"Byron Tabbada","role":"Human Resources","quote":"We create a workplace where people feel respected and motivated to grow.","image":"assets/team-byron.png"}
   ],
   "testimonials": [
     {"id":"jenny-m","name":"Jenny M.","company":"Be There Solutions","quote":"We could not be happier with our team. They are loyal, hardworking and dedicated. ACE helped us lower costs while improving our sales growth.","logo":"assets/be-there-solutions.png","rating":5},
@@ -17,4 +17,3 @@
     {"id":"christmas-celebration","title":"Highlights from Our Christmas Celebration","category":"Celebration","author":"wpsuperadmin","date":"Jun 27, 2025","excerpt":"Thoughtful giveaways, shared gratitude, and a joyful celebration across departments.","body":"The holiday season is all about giving, and this Christmas our company made it extra special with thoughtful giveaways that brought smiles to everyone’s faces.\n\nEach item was a token of appreciation for the hard work and dedication of our team. Moments like these remind us that the true gift of the season is the connection we build together.","cover":"assets/christmas-01.png","images":["assets/christmas-01.png","assets/christmas-02.png","assets/christmas-03.png","assets/christmas-04.png","assets/christmas-05.png","assets/christmas-06.png","assets/christmas-07.png","assets/christmas-08.png","assets/christmas-09.png"]}
   ]
 }
-

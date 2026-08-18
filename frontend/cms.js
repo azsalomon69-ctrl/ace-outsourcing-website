@@ -1,15 +1,14 @@
 (function(){
-  const CSRF_KEY='aceAdminCsrf';
   const apiBase=String(window.ACE_CONFIG?.apiBase||'').replace(/\/$/,'');
   const recognition=Array.from({length:13},(_,index)=>`assets/recognition-${String(index+1).padStart(2,'0')}.png`);
   const valentines=Array.from({length:15},(_,index)=>`assets/black-valentines-${String(index+1).padStart(2,'0')}.png`);
   const christmas=Array.from({length:9},(_,index)=>`assets/christmas-${String(index+1).padStart(2,'0')}.png`);
   const defaults={
     team:[
-      {id:'kristine-p',name:'Kristine P.',role:'Trainer',quote:'We don’t just train for the job. We train for growth.',image:'https://ace-outsourcing.com/wp-content/uploads/2024/12/download-5.jpeg'},
-      {id:'ash-pampuan',name:'Ash Pampuan',role:'Team Leader',quote:'Every team member should feel valued, supported and heard.',image:'https://ace-outsourcing.com/wp-content/uploads/2024/12/ash.jpg'},
-      {id:'rose-esc',name:'Rose Esc',role:'Web Developer',quote:'Innovation helps us improve operations and client satisfaction.',image:'https://ace-outsourcing.com/wp-content/uploads/2024/12/unnamed.jpg'},
-      {id:'byron-tabbada',name:'Byron Tabbada',role:'Human Resources',quote:'We create a workplace where people feel respected and motivated to grow.',image:'https://ace-outsourcing.com/wp-content/uploads/2024/12/Byron.jpeg'}
+      {id:'kristine-p',name:'Kristine P.',role:'Trainer',quote:'We don’t just train for the job. We train for growth.',image:'assets/team-kristine.png'},
+      {id:'ash-pampuan',name:'Ash Pampuan',role:'Team Leader',quote:'Every team member should feel valued, supported and heard.',image:'assets/team-ash.png'},
+      {id:'rose-esc',name:'Rose Esc',role:'Web Developer',quote:'Innovation helps us improve operations and client satisfaction.',image:'assets/team-rose.png'},
+      {id:'byron-tabbada',name:'Byron Tabbada',role:'Human Resources',quote:'We create a workplace where people feel respected and motivated to grow.',image:'assets/team-byron.png'}
     ],
     testimonials:[
       {id:'jenny-m',name:'Jenny M.',company:'Be There Solutions',quote:'We could not be happier with our team. They are loyal, hardworking and dedicated. ACE helped us lower costs while improving our sales growth.',logo:'assets/be-there-solutions.png',rating:5},
@@ -25,15 +24,16 @@
   };
   const clone=value=>JSON.parse(JSON.stringify(value));
   const uid=prefix=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+  let csrfToken='';
   const request=async(path,options={})=>{
     if(!apiBase)throw Object.assign(new Error('The secure backend has not been connected yet.'),{code:'NOT_CONFIGURED'});
     const method=options.method||'GET',headers={Accept:'application/json',...(options.headers||{})};
     if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
-    if(!['GET','HEAD','OPTIONS'].includes(method)){const csrf=sessionStorage.getItem(CSRF_KEY);if(csrf)headers['X-CSRF-Token']=csrf}
+    if(!['GET','HEAD','OPTIONS'].includes(method)&&csrfToken)headers['X-CSRF-Token']=csrfToken;
     const response=await fetch(`${apiBase}${path}`,{...options,method,headers,credentials:'include'});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw Object.assign(new Error(data.error||'The server request failed.'),{status:response.status});
-    if(data.csrfToken)sessionStorage.setItem(CSRF_KEY,data.csrfToken);
+    if(data.csrfToken)csrfToken=data.csrfToken;
     return data;
   };
   window.ACECMS={
@@ -43,6 +43,6 @@
     async resetContent(){return request('/content',{method:'PUT',body:JSON.stringify(clone(defaults))})},
     async login(email,password){return request('/auth/login',{method:'POST',body:JSON.stringify({email,password})})},
     async getSession(){try{return await request('/auth/session')}catch(error){if(error.status===401||error.code==='NOT_CONFIGURED')return null;throw error}},
-    async logout(){try{return await request('/auth/logout',{method:'POST'})}finally{sessionStorage.removeItem(CSRF_KEY)}}
+    async logout(){try{return await request('/auth/logout',{method:'POST'})}finally{csrfToken=''}}
   };
 })();
