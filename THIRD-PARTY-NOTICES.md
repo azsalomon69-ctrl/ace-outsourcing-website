@@ -2,7 +2,9 @@
 
 Audit date: August 18, 2026
 
-The deployed code contains no third-party npm runtime dependencies, JavaScript libraries, CSS frameworks, videos, music, or stock-asset packages requiring bundled license text.
+The deployed code contains one self-hosted third-party interface library. It does not use third-party CSS frameworks, videos, music, or stock-animation packages.
+
+The footer animations use **LottieFiles Lottie Player 2.0.4**, distributed under the MIT License. The preserved license is at `frontend/vendor/lottiefiles/LICENSE`. The player loads from the ACE website itself. The three animation files in `frontend/assets/lottie-*.json` were authored specifically for this project and do not come from the LottieFiles animation marketplace.
 
 The following Google Fonts are self-hosted by this website under the SIL Open Font License 1.1:
 
