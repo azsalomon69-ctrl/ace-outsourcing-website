@@ -120,19 +120,20 @@ function canAttemptLogin(request){
 function clearAttempts(request){loginAttempts.delete(clientAddress(request))}
 
 function normalizeContent(value){
-  if(!value||typeof value!=='object'||!Array.isArray(value.team)||!Array.isArray(value.testimonials)||!Array.isArray(value.blogs))throw Object.assign(new Error('Invalid content structure.'),{status:400});
-  if(value.team.length>100||value.testimonials.length>100||value.blogs.length>250)throw Object.assign(new Error('Content collection limit exceeded.'),{status:400});
+  if(!value||typeof value!=='object'||!Array.isArray(value.team)||!Array.isArray(value.testimonials)||!Array.isArray(value.blogs)||!Array.isArray(value.jobs))throw Object.assign(new Error('Invalid content structure.'),{status:400});
+  if(value.team.length>100||value.testimonials.length>100||value.blogs.length>250||value.jobs.length>250)throw Object.assign(new Error('Content collection limit exceeded.'),{status:400});
   const cleanText=(input,max=20000)=>String(input??'').slice(0,max);
   const cleanUrl=input=>{const value=cleanText(input,4*1024*1024);if(/^data:image\/(png|jpeg|webp|gif);base64,/i.test(value)||value.startsWith('assets/'))return value;return ''};
   return {
     team:value.team.map(item=>({id:cleanText(item.id,100),name:cleanText(item.name,150),role:cleanText(item.role,150),quote:cleanText(item.quote,2000),image:cleanUrl(item.image)})),
     testimonials:value.testimonials.map(item=>({id:cleanText(item.id,100),name:cleanText(item.name,150),company:cleanText(item.company,200),quote:cleanText(item.quote,4000),logo:cleanUrl(item.logo),rating:Math.max(1,Math.min(5,Number(item.rating)||5))})),
-    blogs:value.blogs.map(item=>({id:cleanText(item.id,100),title:cleanText(item.title,250),category:cleanText(item.category,100),author:cleanText(item.author,150),date:cleanText(item.date,100),excerpt:cleanText(item.excerpt,2000),body:cleanText(item.body,50000),cover:cleanUrl(item.cover),images:Array.isArray(item.images)?item.images.slice(0,100).map(cleanUrl).filter(Boolean):[]}))
+    blogs:value.blogs.map(item=>({id:cleanText(item.id,100),title:cleanText(item.title,250),category:cleanText(item.category,100),author:cleanText(item.author,150),date:cleanText(item.date,100),excerpt:cleanText(item.excerpt,2000),body:cleanText(item.body,50000),cover:cleanUrl(item.cover),images:Array.isArray(item.images)?item.images.slice(0,100).map(cleanUrl).filter(Boolean):[]})),
+    jobs:value.jobs.map(item=>({id:cleanText(item.id,100),title:cleanText(item.title,200),department:cleanText(item.department,120),category:['sales','operations','tech'].includes(item.category)?item.category:'operations',employmentType:cleanText(item.employmentType,80),location:cleanText(item.location,150),priority:['urgent','active','open'].includes(item.priority)?item.priority:'open',summary:cleanText(item.summary,5000),responsibilities:Array.isArray(item.responsibilities)?item.responsibilities.slice(0,100).map(value=>cleanText(value,1000)).filter(Boolean):[],qualifications:Array.isArray(item.qualifications)?item.qualifications.slice(0,100).map(value=>cleanText(value,1000)).filter(Boolean):[]}))
   };
 }
 
 async function loadContent(){
-  try{return normalizeContent(JSON.parse(await readFile(contentFile,'utf8')))}catch(error){
+  try{const saved=JSON.parse(await readFile(contentFile,'utf8'));if(!Array.isArray(saved.jobs)){const defaults=JSON.parse(await readFile(defaultFile,'utf8'));saved.jobs=defaults.jobs}return normalizeContent(saved)}catch(error){
     if(error.code!=='ENOENT')console.error('Content load failed:',error.message);
     const defaults=normalizeContent(JSON.parse(await readFile(defaultFile,'utf8')));
     await saveContent(defaults);
