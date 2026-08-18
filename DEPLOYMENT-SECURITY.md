@@ -38,7 +38,7 @@ The production login is handled by the Render backend, not JavaScript stored in 
 
 The hidden ten-click footer shortcut is only a convenience. It is not a security control. The backend must reject every unauthenticated admin request even when somebody knows the login URL.
 
-The current `vercel.json` temporarily redirects `/login`, `/login.html`, `/admin`, and `/admin.html` to the homepage. Remove those redirects after the Render URL is added to `frontend/config.js` and authentication is verified.
+The Render API URL is configured in `frontend/config.js`. Login and admin pages are served by Vercel while all authentication and content-management authorization is enforced by Render.
 
 ## API requirements
 
@@ -60,7 +60,7 @@ The current `vercel.json` temporarily redirects `/login`, `/login.html`, `/admin
 ## Before production launch
 
 1. Deploy the Render backend and verify `/health`.
-2. Add its URL to `frontend/config.js`, remove the temporary Vercel admin redirects, and push the changes.
+2. Verify the Render URL in `frontend/config.js` and confirm Vercel can reach it.
 3. Test login throttling, session expiry, CSRF protection, and access control.
 4. Connect Google Sheets and Drive using backend-only credentials.
 5. Add a private admin-user store if more than one administrator is required.

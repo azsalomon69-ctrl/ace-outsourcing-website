@@ -3,12 +3,6 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "outputDirectory": "frontend",
-  "redirects": [
-    { "source": "/login", "destination": "/", "permanent": false },
-    { "source": "/login.html", "destination": "/", "permanent": false },
-    { "source": "/admin", "destination": "/", "permanent": false },
-    { "source": "/admin.html", "destination": "/", "permanent": false }
-  ],
   "headers": [
     {
       "source": "/(.*)",

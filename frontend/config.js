@@ -1,4 +1,3 @@
 window.ACE_CONFIG={
-  apiBase:''
+  apiBase:'https://ace-admin-api.onrender.com'
 };
-
