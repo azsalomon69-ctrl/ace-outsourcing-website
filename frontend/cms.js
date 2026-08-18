@@ -1,9 +1,6 @@
 (function(){
-  const DB_NAME='aceWebsiteCms';
-  const STORE='settings';
-  const CONTENT_KEY='content-v1';
-  const ADMIN_KEY='admin-v1';
-  const SESSION_KEY='aceAdminSignedIn';
+  const CSRF_KEY='aceAdminCsrf';
+  const apiBase=String(window.ACE_CONFIG?.apiBase||'').replace(/\/$/,'');
   const recognition=Array.from({length:13},(_,index)=>`assets/recognition-${String(index+1).padStart(2,'0')}.png`);
   const valentines=Array.from({length:15},(_,index)=>`assets/black-valentines-${String(index+1).padStart(2,'0')}.png`);
   const christmas=Array.from({length:9},(_,index)=>`assets/christmas-${String(index+1).padStart(2,'0')}.png`);
@@ -28,20 +25,24 @@
   };
   const clone=value=>JSON.parse(JSON.stringify(value));
   const uid=prefix=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
-  const openDb=()=>new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,1);request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(STORE))request.result.createObjectStore(STORE)};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)});
-  const getValue=async key=>{const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),request=tx.objectStore(STORE).get(key);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);tx.oncomplete=()=>db.close()})};
-  const setValue=async(key,value)=>{const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(value,key);tx.oncomplete=()=>{db.close();resolve(value)};tx.onerror=()=>reject(tx.error)})};
-  const hash=async value=>{const bytes=new TextEncoder().encode(value),digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('')};
+  const request=async(path,options={})=>{
+    if(!apiBase)throw Object.assign(new Error('The secure backend has not been connected yet.'),{code:'NOT_CONFIGURED'});
+    const method=options.method||'GET',headers={Accept:'application/json',...(options.headers||{})};
+    if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
+    if(!['GET','HEAD','OPTIONS'].includes(method)){const csrf=sessionStorage.getItem(CSRF_KEY);if(csrf)headers['X-CSRF-Token']=csrf}
+    const response=await fetch(`${apiBase}${path}`,{...options,method,headers,credentials:'include'});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw Object.assign(new Error(data.error||'The server request failed.'),{status:response.status});
+    if(data.csrfToken)sessionStorage.setItem(CSRF_KEY,data.csrfToken);
+    return data;
+  };
   window.ACECMS={
-    defaults:clone(defaults),uid,
-    async getContent(){return clone((await getValue(CONTENT_KEY))||defaults)},
-    async saveContent(content){return setValue(CONTENT_KEY,clone(content))},
-    async resetContent(){return setValue(CONTENT_KEY,clone(defaults))},
-    async hasAdmin(){return Boolean(await getValue(ADMIN_KEY))},
-    async createAdmin(email,password){const admin={email:String(email).trim().toLowerCase(),passwordHash:await hash(password)};await setValue(ADMIN_KEY,admin);return admin},
-    async verifyAdmin(email,password){const admin=await getValue(ADMIN_KEY);return Boolean(admin&&admin.email===String(email).trim().toLowerCase()&&admin.passwordHash===await hash(password))},
-    signIn(){sessionStorage.setItem(SESSION_KEY,'yes')},
-    signOut(){sessionStorage.removeItem(SESSION_KEY)},
-    isSignedIn(){return sessionStorage.getItem(SESSION_KEY)==='yes'}
+    defaults:clone(defaults),uid,apiBase,isConfigured:Boolean(apiBase),
+    async getContent(){try{return clone(await request('/content'))}catch(error){console.warn('Using bundled website content:',error.message);return clone(defaults)}},
+    async saveContent(content){return request('/content',{method:'PUT',body:JSON.stringify(clone(content))})},
+    async resetContent(){return request('/content',{method:'PUT',body:JSON.stringify(clone(defaults))})},
+    async login(email,password){return request('/auth/login',{method:'POST',body:JSON.stringify({email,password})})},
+    async getSession(){try{return await request('/auth/session')}catch(error){if(error.status===401||error.code==='NOT_CONFIGURED')return null;throw error}},
+    async logout(){try{return await request('/auth/logout',{method:'POST'})}finally{sessionStorage.removeItem(CSRF_KEY)}}
   };
 })();

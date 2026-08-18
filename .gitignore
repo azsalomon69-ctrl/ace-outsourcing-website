@@ -2,7 +2,7 @@
 .env.*
 !.env.example
 backend/node_modules/
+backend/data/content.json
 node_modules/
 *.log
 .vercel/
-

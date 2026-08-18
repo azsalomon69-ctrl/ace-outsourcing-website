@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded',async()=>{
-  if(!window.ACECMS||!ACECMS.isSignedIn()){window.location.replace('login.html');return}
+  if(!window.ACECMS||!(await ACECMS.getSession())){window.location.replace('login.html');return}
   let content=await ACECMS.getContent(),editType='',editId='';
   const editor=document.querySelector('[data-admin-editor]'),editorForm=document.querySelector('[data-admin-editor-form]'),fields=document.querySelector('[data-editor-fields]'),state=document.querySelector('[data-admin-state]');
   const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const index=content[editType].findIndex(item=>item.id===record.id);if(index>=0)content[editType][index]=record;else content[editType].push(record);await save();editor.close();
   });
   document.querySelector('[data-editor-close]').addEventListener('click',()=>editor.close());document.querySelector('[data-editor-cancel]').addEventListener('click',()=>editor.close());
-  document.querySelector('[data-admin-logout]').addEventListener('click',()=>{ACECMS.signOut();window.location.replace('login.html')});
+  document.querySelector('[data-admin-logout]').addEventListener('click',async()=>{await ACECMS.logout();window.location.replace('login.html')});
   document.querySelector('[data-admin-reset]').addEventListener('click',async()=>{if(!confirm('Restore the original people, testimonials, and blog posts?'))return;content=await ACECMS.resetContent();render();setState('Original content restored.')});
   render();
 });

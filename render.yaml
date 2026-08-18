@@ -3,10 +3,12 @@ services:
     name: ace-admin-api
     runtime: node
     rootDir: backend
+    region: singapore
+    plan: free
     buildCommand: npm ci --omit=dev
     startCommand: npm start
     healthCheckPath: /health
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
@@ -18,10 +20,3 @@ services:
         generateValue: true
       - key: FRONTEND_ORIGIN
         sync: false
-      - key: GOOGLE_SERVICE_ACCOUNT_JSON
-        sync: false
-      - key: GOOGLE_SHEETS_ID
-        sync: false
-      - key: GOOGLE_DRIVE_FOLDER_ID
-        sync: false
-
