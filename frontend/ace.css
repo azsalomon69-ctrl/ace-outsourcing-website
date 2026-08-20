@@ -155,7 +155,7 @@ body.modal-open{overflow:hidden}
 .home-hero-media:before{content:"";position:absolute;z-index:-1;inset:0 24px 12px -18px;border:1px solid rgba(255,255,255,.18);border-radius:32px;transform:rotate(-2deg)}
 .home-hero-image-frame{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.22);border-radius:28px;background:#fff;box-shadow:0 34px 90px rgba(0,20,27,.38)}
 .home-hero-image-frame:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 38%)}
-.home-hero-image-frame img{width:100%;aspect-ratio:4/3;object-fit:cover;object-position:center}
+.home-hero-image-frame img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:center}
 .home-hero-note{position:absolute;right:-20px;bottom:2px;display:grid;gap:4px;max-width:260px;padding:18px 22px;border:1px solid rgba(255,255,255,.38);border-radius:18px;background:rgba(255,255,255,.94);color:#052f38;box-shadow:0 18px 45px rgba(0,20,27,.26);backdrop-filter:blur(12px)}
 .home-hero-note span{color:#176fa8;font-family:"Montserrat","Open Sans",Arial,sans-serif;font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
 .home-hero-note strong{font-family:"Montserrat","Open Sans",Arial,sans-serif;font-size:.92rem;line-height:1.35}
