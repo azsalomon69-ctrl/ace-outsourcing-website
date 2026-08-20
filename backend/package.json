@@ -12,6 +12,7 @@
     "test:login-entry": "node scripts/test-login-entry.mjs",
     "audit-images": "node scripts/audit-images.mjs",
     "optimize-static-images": "node scripts/optimize-static-images.mjs",
+    "generate-responsive-images": "node scripts/generate-responsive-images.mjs",
     "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {

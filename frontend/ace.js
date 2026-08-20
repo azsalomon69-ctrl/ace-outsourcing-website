@@ -8,9 +8,22 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(footer?.id==='site-footer')footer.querySelector('.footer')?.removeAttribute('id');
  const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
  if(footer&&!motionPreference.matches){
+  let lottieRequested=false;
   const revealLottie=()=>customElements.whenDefined('lottie-player').then(()=>document.documentElement.classList.add('lottie-ready'));
-  if(customElements.get('lottie-player'))revealLottie();
-  else{const lottieScript=document.createElement('script');lottieScript.src='vendor/lottiefiles/lottie-player.js';lottieScript.defer=true;lottieScript.addEventListener('load',revealLottie,{once:true});document.head.append(lottieScript)}
+  const loadLottie=()=>{
+   if(lottieRequested)return;
+   lottieRequested=true;
+   if(customElements.get('lottie-player')){revealLottie();return}
+   const lottieScript=document.createElement('script');
+   lottieScript.src='vendor/lottiefiles/lottie-player.js';
+   lottieScript.async=true;
+   lottieScript.addEventListener('load',revealLottie,{once:true});
+   document.head.append(lottieScript);
+  };
+  if('IntersectionObserver'in window){
+   const footerObserver=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){loadLottie();footerObserver.disconnect()}},{rootMargin:'320px 0px'});
+   footerObserver.observe(footer);
+  }else loadLottie();
  }
  const hiddenLoginTrigger=document.querySelector('[data-hidden-login-trigger]');
  let hiddenLoginClickQueue=Promise.resolve(),hiddenLoginNavigating=false;
@@ -58,12 +71,22 @@ document.addEventListener('DOMContentLoaded',async()=>{
   consentBanner.querySelector('[data-consent="all"]')?.addEventListener('click',()=>{acceptGoogleServices();consentBanner.remove()});
  }
  const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+ const responsiveImages={
+  'assets/dinner-night-out.webp':{src:'assets/responsive/dinner-night-out-768w.webp',srcset:'assets/responsive/dinner-night-out-480w.webp 480w, assets/responsive/dinner-night-out-768w.webp 768w',width:960,height:1280},
+  'assets/christmas-01.webp':{src:'assets/responsive/christmas-01-768w.webp',srcset:'assets/responsive/christmas-01-480w.webp 480w, assets/responsive/christmas-01-768w.webp 768w',width:1600,height:1200},
+  'assets/black-valentines-01.webp':{src:'assets/responsive/black-valentines-01-768w.webp',srcset:'assets/responsive/black-valentines-01-480w.webp 480w, assets/responsive/black-valentines-01-768w.webp 768w',width:1280,height:960}
+ };
+ const responsivePostImage=(source,title)=>{
+  const image=responsiveImages[source],safeTitle=escapeHtml(title);
+  if(!image)return `<img class="post-image" src="${escapeHtml(source)}" alt="${safeTitle}" loading="lazy">`;
+  return `<img class="post-image" src="${image.src}" srcset="${image.srcset}" sizes="(max-width: 700px) calc(100vw - 40px), 40vw" width="${image.width}" height="${image.height}" alt="${safeTitle}" loading="lazy">`;
+ };
  const cmsContent=window.ACECMS?await ACECMS.getContent():null;
  if(cmsContent){
   const teamGrid=document.querySelector('.team-grid');
   if(teamGrid)teamGrid.innerHTML=cmsContent.team.map(member=>`<article class="team-card"><img src="${escapeHtml(member.image)}" alt="${escapeHtml(`${member.name}, ACE ${member.role}`)}" loading="lazy"><div><small>${escapeHtml(member.role)}</small><h3>${escapeHtml(member.name)}</h3><p>“${escapeHtml(member.quote)}”</p></div></article>`).join('');
   const homeJournal=document.querySelector('.journal-grid');
-  if(homeJournal)homeJournal.innerHTML=cmsContent.blogs.slice(0,3).map(post=>`<article class="post"><img class="post-image" src="${escapeHtml(post.cover)}" alt="${escapeHtml(post.title)}" loading="lazy"><small>${escapeHtml(post.category)}</small><h3>${escapeHtml(post.title)}</h3><a class="text-link" href="blog.html#${escapeHtml(post.id)}">Read story <span>→</span></a></article>`).join('');
+  if(homeJournal)homeJournal.innerHTML=cmsContent.blogs.slice(0,3).map(post=>`<article class="post">${responsivePostImage(post.cover,post.title)}<small>${escapeHtml(post.category)}</small><h3>${escapeHtml(post.title)}</h3><a class="text-link" href="blog.html#${escapeHtml(post.id)}">Read story <span>→</span></a></article>`).join('');
   const journalList=document.querySelector('.journal-entry-list');
   if(journalList)journalList.innerHTML=cmsContent.blogs.map(post=>{const paragraphs=String(post.body||'').split(/\n{2,}/).map(paragraph=>`<p>${escapeHtml(paragraph)}</p>`).join(''),photos=(post.images?.length?post.images:[post.cover]).filter(Boolean).map((image,index)=>`<img src="${escapeHtml(image)}" alt="${escapeHtml(`${post.title} photo ${index+1}`)}">`).join('');return `<details class="journal-entry" id="${escapeHtml(post.id)}"><summary><img src="${escapeHtml(post.cover)}" alt="${escapeHtml(post.title)}"><span class="journal-entry-heading"><span class="article-meta"><span>${escapeHtml(post.author||'ACE Team')}</span><span>${escapeHtml(post.date)}</span><span>${escapeHtml(post.category)}</span></span><strong>${escapeHtml(post.title)}</strong><small>Read story</small></span></summary><div class="journal-entry-body"><div class="article-meta"><span>${escapeHtml(post.author||'ACE Team')}</span><span>${escapeHtml(post.date)}</span><span>${escapeHtml(post.category)}</span></div>${post.excerpt?`<p class="article-lead">${escapeHtml(post.excerpt)}</p>`:''}${paragraphs}${photos?`<div class="journal-gallery" aria-label="${escapeHtml(post.title)} photo gallery">${photos}</div>`:''}</div></details>`}).join('');
   const managedJobs=document.querySelector('[data-managed-jobs]');
