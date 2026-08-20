@@ -1,6 +1,6 @@
 # Asset, licensing, and trademark register
 
-Audit date: August 18, 2026
+Audit date: August 20, 2026
 
 This register records provenance known from the project history. It does not convert an unverified asset into an authorized asset. ACE should retain written licenses, releases, employment-policy authority, or client approvals outside the public repository.
 
@@ -30,7 +30,10 @@ This register records provenance known from the project history. It does not con
 | `frontend/assets/lottie-orbit.json`, `lottie-compass.json`, `lottie-message.json` | Decorative footer animation | Project-authored for ACE | Original vector animation data created for this repository. No marketplace animation artwork is included. |
 | `frontend/vendor/lottiefiles/lottie-player.js` and `LICENSE` | Rendering local Lottie animation files | Official `@lottiefiles/lottie-player` package | Self-hosted under the MIT License. Preserve the included license. The package is used only to render local project-authored animation data. |
 | `frontend/*.html`, `frontend/ace.css`, `frontend/ace.js`, `frontend/*.js`, `backend/*.mjs` | Site and API code | Project-authored for ACE | Project-authored except for the separately listed self-hosted LottieFiles player. |
-| `backend/package.json`, `backend/package-lock.json` | Node runtime declaration | Project-authored | No npm runtime dependencies are installed. The backend uses Node.js built-in modules only. |
+| `backend/package.json`, `backend/package-lock.json`, `@supabase/supabase-js` | Server-side PostgreSQL and Storage access | Official Supabase JavaScript package | MIT License. Used only by the Render backend; the Supabase secret key is not shipped to browsers. |
+| `busboy` | Streaming multipart upload parsing | Official npm package by Brian White | MIT-style license included in the package. Used by the Render backend to enforce upload limits before image processing. |
+| `sharp` and its packaged runtime dependencies | Server-side image validation, resizing, and WebP encoding | Official sharp npm package | Apache License 2.0. Used by the Render backend and maintenance scripts. Preserve package notices in distributed dependency bundles. |
+| `frontend/assets/*.webp` | Optimized versions of the listed repository images | Generated locally from the corresponding user-supplied PNG files | Ownership status is identical to each source PNG. Optimization does not change or establish publication rights. Original files remain until the optimized Storage migration is verified. |
 
 ## Removed or avoided sources
 

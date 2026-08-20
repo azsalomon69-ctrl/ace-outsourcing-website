@@ -8,8 +8,14 @@
   },
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs",
+    "check": "node --check server.mjs && node --check lib/content-repository.mjs && node --check lib/media-service.mjs && node --check lib/supabase.mjs",
+    "audit-images": "node scripts/audit-images.mjs",
+    "optimize-static-images": "node scripts/optimize-static-images.mjs",
     "hash-password": "node scripts/hash-password.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "busboy": "^1.6.0",
+    "sharp": "^0.34.3"
   }
 }
-

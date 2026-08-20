@@ -1,8 +1,8 @@
 # Third-party notices
 
-Audit date: August 18, 2026
+Audit date: August 20, 2026
 
-The deployed code contains one self-hosted third-party interface library. It does not use third-party CSS frameworks, videos, music, or stock-animation packages.
+The deployed frontend contains one self-hosted third-party interface library. It does not use third-party CSS frameworks, videos, music, or stock-animation packages.
 
 The footer animations use **LottieFiles Lottie Player 2.0.4**, distributed under the MIT License. The preserved license is at `frontend/vendor/lottiefiles/LICENSE`. The player loads from the ACE website itself. The three animation files in `frontend/assets/lottie-*.json` were authored specifically for this project and do not come from the LottieFiles animation marketplace.
 
@@ -12,6 +12,14 @@ The following Google Fonts are self-hosted by this website under the SIL Open Fo
 - **Open Sans**, with its license preserved at `frontend/assets/fonts/OpenSans-OFL.txt`.
 
 The font files load from the ACE website itself. Visitors do not connect to Google merely to render these fonts.
+
+The Render backend uses these open-source runtime libraries:
+
+- **Supabase JavaScript**, distributed under the MIT License, for server-side PostgreSQL and Storage access.
+- **busboy**, distributed under its included MIT-style license, for bounded streaming multipart parsing.
+- **sharp**, distributed under the Apache License 2.0, for authoritative image validation, resizing, and WebP encoding.
+
+Exact resolved versions and transitive dependencies are recorded in `backend/package-lock.json`. Their package license files remain in the installed dependency distribution.
 
 The site can connect to these external services:
 

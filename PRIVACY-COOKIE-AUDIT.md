@@ -1,6 +1,6 @@
 # Privacy and cookie implementation audit
 
-Audit date: August 18, 2026
+Audit date: August 20, 2026
 
 This is a factual implementation audit, not a claim of compliance with every law in every jurisdiction. Re-run it whenever analytics, advertising, application handling, Google Sheets, Google Drive, email delivery, or another provider is added.
 
@@ -9,14 +9,15 @@ This is a factual implementation audit, not a claim of compliance with every law
 | Cookie | Classification | Set by | Purpose | Production attributes | Expiry |
 | --- | --- | --- | --- | --- | --- |
 | `ace_session` | Strictly necessary | ACE Render API through the same-origin Vercel `/api` proxy | Signed administrator session and CSRF binding | `HttpOnly`; `Secure`; `SameSite=Lax`; `Path=/api`; no `Domain` attribute | Maximum 8 hours, or immediate deletion on logout |
+| `ace_privacy_choice` | Preference | ACE public website | Remembers whether optional Google Street View may load | `Secure` on HTTPS; `SameSite=Lax`; website path | Maximum 180 days |
 
-No public-page preference, analytics, advertising, marketing, or social-media cookies are set by ACE code.
+No analytics, advertising, marketing, or social-media cookies are set by ACE code.
 
 ## Browser storage
 
 - No authentication credentials, passwords, session identifiers, or CSRF tokens are stored in `localStorage` or `sessionStorage`.
 - The admin CSRF token is kept in JavaScript memory only and is lost when the page closes or reloads.
-- Admin image uploads are read and resized in browser memory before being sent to the authenticated API.
+- Admin-selected image files are sent to the authenticated API. Validation, resizing, format conversion, quality-aware compression, Storage upload, and metadata writes are server-authoritative.
 
 ## Trackers and third-party requests
 
@@ -25,7 +26,8 @@ No public-page preference, analytics, advertising, marketing, or social-media co
 - Employee portraits and hero/background images previously loaded from the old WordPress site were replaced with local assets.
 - Google Street View no longer loads on page view. The iframe is created only after the visitor selects **Load Street View**.
 - Facebook, LinkedIn, and Google Maps are ordinary outbound links. No social SDK is embedded.
-- Vercel serves the public site and proxies `/api`; Render serves the authenticated content API. Both providers can receive normal request metadata and operational logs.
+- Vercel serves the public site and proxies `/api`; Render serves the authenticated content and image-processing API. Both providers can receive normal request metadata and operational logs.
+- Supabase stores structured CMS content, media metadata, and optimized public website images. Public pages request those published images directly from Supabase Storage; Supabase secret credentials remain on Render.
 
 ## Form data
 
@@ -33,7 +35,7 @@ The client and careers forms are currently prototypes. Their fields and selected
 
 ## Consent conclusion for the current build
 
-The current build has one strictly necessary admin-session cookie and no non-essential cookies or trackers that execute automatically. A generic cookie banner would therefore be misleading and was not added. The optional Google Street View connection is disclosed immediately before the visitor activates it.
+The current build has one strictly necessary admin-session cookie, one Street View preference cookie, and no analytics or advertising trackers. The branded privacy-choice panel controls whether optional Google Street View loads.
 
 This conclusion must be revisited for the actual deployment jurisdictions and before any non-essential technology is enabled.
 
@@ -44,7 +46,7 @@ This conclusion must be revisited for the actual deployment jurisdictions and be
 - The session payload no longer includes the administrator email address.
 - Login rate limiting retains an IP address and attempt count in process memory for at most 15 minutes.
 - State-changing API calls require the signed session and matching CSRF token.
-- The Vercel Content Security Policy allows only same-origin scripts, styles, fonts, images, and API calls; Google frames remain allowed only for the visitor-activated map.
+- The Vercel Content Security Policy allows same-origin resources, published images from Supabase Storage, and the Storage verification request used during the authenticated migration. Google frames remain limited to the map integration.
 
 ## Re-audit triggers
 
@@ -53,4 +55,3 @@ This conclusion must be revisited for the actual deployment jurisdictions and be
 - Changing the Vercel or Render domains
 - Allowing administrators to embed externally hosted images
 - Adding another administrator or user-facing accounts
-

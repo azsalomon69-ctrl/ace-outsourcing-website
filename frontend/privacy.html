@@ -11,13 +11,13 @@
 <body data-page="privacy">
   <div data-site-header></div>
   <main class="legal-page">
-    <section class="legal-hero"><div class="container"><span class="eyebrow">Privacy and cookies</span><h1>How this website handles information.</h1><p>Effective August 18, 2026. This notice describes the website as it is currently implemented. It should be reviewed whenever forms, analytics, Google Sheets, Google Drive, or other services are added.</p></div></section>
+    <section class="legal-hero"><div class="container"><span class="eyebrow">Privacy and cookies</span><h1>How this website handles information.</h1><p>Effective August 20, 2026. This notice describes the website as it is currently implemented. It should be reviewed whenever forms, analytics, Google Sheets, Google Drive, or other services are added.</p></div></section>
     <section class="section"><div class="container legal-content">
       <h2>Who operates this website</h2>
       <p>ACE Outsource Solutions operates this website. Questions about prospective-client information may be sent to <a href="mailto:info@ace-outsourcing.com">info@ace-outsourcing.com</a>. Questions about careers or applicant information may be sent to <a href="mailto:hr@ace-outsourcing.com">hr@ace-outsourcing.com</a>.</p>
 
       <h2>Information processed when you visit</h2>
-      <p>Vercel hosts the public website and Render hosts the administrative API. Like most hosting services, they may process technical request data such as an IP address, browser and device information, requested URL, timestamps, and diagnostic or security logs. Their retention and use of provider logs are controlled by the <a class="text-link" href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Privacy Policy</a> and <a class="text-link" href="https://render.com/privacy" target="_blank" rel="noopener">Render Privacy Policy</a>.</p>
+      <p>Vercel hosts the public website, Render hosts the administrative API and image-processing service, and Supabase stores structured website content, media metadata, and optimized public website images. Like most hosting services, they may process technical request data such as an IP address, browser and device information, requested URL, timestamps, and diagnostic or security logs. Their retention and use of provider logs are controlled by the <a class="text-link" href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Privacy Policy</a>, <a class="text-link" href="https://render.com/privacy" target="_blank" rel="noopener">Render Privacy Policy</a>, and <a class="text-link" href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Privacy Policy</a>.</p>
       <p>The website does not currently run analytics, advertising pixels, behavioral tracking, or marketing automation.</p>
       <p>Decorative interface animations use a self-hosted, MIT-licensed LottieFiles player and locally stored animation files. Loading these animations does not contact LottieFiles.</p>
 
@@ -32,6 +32,7 @@
 
       <h2>Administrative security data</h2>
       <p>Admin login credentials are sent over HTTPS to the Render API. The configured password is stored by Render only as a salted scrypt hash. The API keeps a short-lived, in-memory record of an IP address and failed-login count for up to 15 minutes to limit repeated login attempts. The signed session cookie expires after no more than 8 hours.</p>
+      <p>When an administrator uploads a website image, Render validates and quality-optimizes it before storing the optimized file in Supabase Storage. Supabase media records may include the file's dimensions, size, format, checksum, alternative text, source reference, and rights or permission note. Unnecessarily large originals are not retained by this pipeline.</p>
 
       <h2>Google Street View and external links</h2>
       <p>Google Street View loads automatically after you choose “Accept and show Street View.” If you choose necessary cookies only, it remains blocked until you explicitly enable it on the contact page. When it loads, your browser connects directly to Google, which may receive technical data and information about your interaction under the <a class="text-link" href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>. Links to Google Maps, Facebook, and LinkedIn also take you to those services, where their policies apply.</p>

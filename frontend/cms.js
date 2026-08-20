@@ -1,8 +1,8 @@
 (function(){
   const apiBase=String(window.ACE_CONFIG?.apiBase||'').replace(/\/$/,'');
-  const recognition=Array.from({length:13},(_,index)=>`assets/recognition-${String(index+1).padStart(2,'0')}.png`);
-  const valentines=Array.from({length:15},(_,index)=>`assets/black-valentines-${String(index+1).padStart(2,'0')}.png`);
-  const christmas=Array.from({length:9},(_,index)=>`assets/christmas-${String(index+1).padStart(2,'0')}.png`);
+  const recognition=Array.from({length:13},(_,index)=>`assets/recognition-${String(index+1).padStart(2,'0')}.webp`);
+  const valentines=Array.from({length:15},(_,index)=>`assets/black-valentines-${String(index+1).padStart(2,'0')}.webp`);
+  const christmas=Array.from({length:9},(_,index)=>`assets/christmas-${String(index+1).padStart(2,'0')}.webp`);
   const jobs=[
     {id:'sales-representative',title:'Sales Representative',department:'Sales',category:'sales',employmentType:'Full-time',location:'Santa Rosa, Laguna',priority:'urgent',summary:'Join our dynamic team and help ACE expand its business and connect with clients worldwide.',responsibilities:['Identify and reach out to potential customers','Communicate with clients through calls, email, and meetings','Present services and explain their business value','Handle objections, negotiate terms, and close sales','Maintain customer relationships and provide follow-up support'],qualifications:['Strong communication and persuasion skills','Customer service orientation','Effective negotiation skills','Good time management','Resilience and adaptability']},
     {id:'customer-services',title:'Customer Services',department:'Customer Experience',category:'operations',employmentType:'Full-time',location:'Santa Rosa, Laguna',priority:'urgent',summary:'Support customers by answering questions, resolving concerns, and creating a positive experience.',responsibilities:['Handle customer inquiries by phone, email, and chat','Resolve customer concerns and provide clear solutions','Document interactions and escalate complex issues'],qualifications:['Clear and professional communication','Problem-solving ability','Patience and empathy','Attention to detail']},
@@ -17,21 +17,21 @@
   ];
   const defaults={
     team:[
-      {id:'kristine-p',name:'Kristine P.',role:'Trainer',quote:'We don’t just train for the job. We train for growth.',image:'assets/team-kristine.png'},
-      {id:'ash-pampuan',name:'Ash Pampuan',role:'Team Leader',quote:'Every team member should feel valued, supported and heard.',image:'assets/team-ash.png'},
-      {id:'rose-esc',name:'Rose Esc',role:'Web Developer',quote:'Innovation helps us improve operations and client satisfaction.',image:'assets/team-rose.png'},
-      {id:'byron-tabbada',name:'Byron Tabbada',role:'Human Resources',quote:'We create a workplace where people feel respected and motivated to grow.',image:'assets/team-byron.png'}
+      {id:'kristine-p',name:'Kristine P.',role:'Trainer',quote:'We don’t just train for the job. We train for growth.',image:'assets/team-kristine.webp'},
+      {id:'ash-pampuan',name:'Ash Pampuan',role:'Team Leader',quote:'Every team member should feel valued, supported and heard.',image:'assets/team-ash.webp'},
+      {id:'rose-esc',name:'Rose Esc',role:'Web Developer',quote:'Innovation helps us improve operations and client satisfaction.',image:'assets/team-rose.webp'},
+      {id:'byron-tabbada',name:'Byron Tabbada',role:'Human Resources',quote:'We create a workplace where people feel respected and motivated to grow.',image:'assets/team-byron.webp'}
     ],
     testimonials:[
-      {id:'jenny-m',name:'Jenny M.',company:'Be There Solutions',quote:'We could not be happier with our team. They are loyal, hardworking and dedicated. ACE helped us lower costs while improving our sales growth.',logo:'assets/be-there-solutions.png',rating:5},
-      {id:'adam-j',name:'Adam J.',company:'Figshelf',quote:'ACE helped us put a plan in place to build and scale as our platform requires more manpower. We are excited about the journey and the outcome ahead.',logo:'assets/figshelf.png',rating:5},
-      {id:'shai-a',name:'Shai A.',company:'Green Marketing',quote:'From day one, ACE was professional and created a plan to recruit, onboard, train and grow my sales team. The results have been excellent.',logo:'assets/green-marketing.png',rating:5}
+      {id:'jenny-m',name:'Jenny M.',company:'Be There Solutions',quote:'We could not be happier with our team. They are loyal, hardworking and dedicated. ACE helped us lower costs while improving our sales growth.',logo:'assets/be-there-solutions.webp',rating:5},
+      {id:'adam-j',name:'Adam J.',company:'Figshelf',quote:'ACE helped us put a plan in place to build and scale as our platform requires more manpower. We are excited about the journey and the outcome ahead.',logo:'assets/figshelf.webp',rating:5},
+      {id:'shai-a',name:'Shai A.',company:'Green Marketing',quote:'From day one, ACE was professional and created a plan to recruit, onboard, train and grow my sales team. The results have been excellent.',logo:'assets/green-marketing.webp',rating:5}
     ],
     blogs:[
-      {id:'dinner-night-out',title:'Dinner Night Out: Strengthening Bonds, Boosting Morale',category:'Team culture',author:'wpsuperadmin',date:'Jun 29, 2025',excerpt:'A meaningful evening to unwind, connect, and recharge as one team.',body:'In every successful team, connection and communication are just as important as performance and productivity. We recently took a well-deserved break from our busy routines to enjoy a Dinner Night Out, a simple yet meaningful way to unwind, connect, and recharge as one team.\n\nThe evening was filled with laughter, great conversations, and even greater food. It was an opportunity to strengthen our bonds outside the usual work environment.\n\nMoments like these remind us that building a strong team goes beyond the workplace. It is about fostering genuine relationships, boosting morale, and creating a culture where everyone feels seen, heard, and motivated.',cover:'assets/dinner-night-out.png',images:['assets/dinner-night-out.png']},
-      {id:'recognizing-excellence',title:'Recognizing Excellence: Personal Goals and Top Performers',category:'Recognition',author:'wpsuperadmin',date:'Jun 29, 2025',excerpt:'Celebrating the people whose dedication, progress, and results inspire the whole team.',body:'At our company, we believe in celebrating growth, dedication, and results. We proudly recognize team members who go above and beyond through our Personal Goal Incentives and Top Performer awards.\n\nEach milestone represents a story of perseverance, dedication, and growth. Every effort counts, and every achievement helps move the entire team forward.\n\nCongratulations to all our top performers. Your excellence continues to inspire others to aim higher.',cover:'assets/recognition-01.png',images:recognition},
-      {id:'ace-black-valentines',title:'ACE Black Valentine’s',category:'Celebration',author:'wpsuperadmin',date:'Jun 27, 2025',excerpt:'A day of appreciation, fun, and connection across the ACE team.',body:'Valentine’s Day is not just about romance. It is about celebrating all forms of love, including the appreciation and camaraderie we share in the workplace.\n\nOur Black Valentine’s theme represented strong and unwavering love for our families, our clients, and the company.',cover:'assets/black-valentines-01.png',images:valentines},
-      {id:'christmas-celebration',title:'Highlights from Our Christmas Celebration',category:'Celebration',author:'wpsuperadmin',date:'Jun 27, 2025',excerpt:'Thoughtful giveaways, shared gratitude, and a joyful celebration across departments.',body:'The holiday season is all about giving, and this Christmas our company made it extra special with thoughtful giveaways that brought smiles to everyone’s faces.\n\nEach item was a token of appreciation for the hard work and dedication of our team. Moments like these remind us that the true gift of the season is the connection we build together.',cover:'assets/christmas-01.png',images:christmas}
+      {id:'dinner-night-out',title:'Dinner Night Out: Strengthening Bonds, Boosting Morale',category:'Team culture',author:'wpsuperadmin',date:'Jun 29, 2025',excerpt:'A meaningful evening to unwind, connect, and recharge as one team.',body:'In every successful team, connection and communication are just as important as performance and productivity. We recently took a well-deserved break from our busy routines to enjoy a Dinner Night Out, a simple yet meaningful way to unwind, connect, and recharge as one team.\n\nThe evening was filled with laughter, great conversations, and even greater food. It was an opportunity to strengthen our bonds outside the usual work environment.\n\nMoments like these remind us that building a strong team goes beyond the workplace. It is about fostering genuine relationships, boosting morale, and creating a culture where everyone feels seen, heard, and motivated.',cover:'assets/dinner-night-out.webp',images:['assets/dinner-night-out.webp']},
+      {id:'recognizing-excellence',title:'Recognizing Excellence: Personal Goals and Top Performers',category:'Recognition',author:'wpsuperadmin',date:'Jun 29, 2025',excerpt:'Celebrating the people whose dedication, progress, and results inspire the whole team.',body:'At our company, we believe in celebrating growth, dedication, and results. We proudly recognize team members who go above and beyond through our Personal Goal Incentives and Top Performer awards.\n\nEach milestone represents a story of perseverance, dedication, and growth. Every effort counts, and every achievement helps move the entire team forward.\n\nCongratulations to all our top performers. Your excellence continues to inspire others to aim higher.',cover:'assets/recognition-01.webp',images:recognition},
+      {id:'ace-black-valentines',title:'ACE Black Valentine’s',category:'Celebration',author:'wpsuperadmin',date:'Jun 27, 2025',excerpt:'A day of appreciation, fun, and connection across the ACE team.',body:'Valentine’s Day is not just about romance. It is about celebrating all forms of love, including the appreciation and camaraderie we share in the workplace.\n\nOur Black Valentine’s theme represented strong and unwavering love for our families, our clients, and the company.',cover:'assets/black-valentines-01.webp',images:valentines},
+      {id:'christmas-celebration',title:'Highlights from Our Christmas Celebration',category:'Celebration',author:'wpsuperadmin',date:'Jun 27, 2025',excerpt:'Thoughtful giveaways, shared gratitude, and a joyful celebration across departments.',body:'The holiday season is all about giving, and this Christmas our company made it extra special with thoughtful giveaways that brought smiles to everyone’s faces.\n\nEach item was a token of appreciation for the hard work and dedication of our team. Moments like these remind us that the true gift of the season is the connection we build together.',cover:'assets/christmas-01.webp',images:christmas}
     ],
     jobs
   };
@@ -41,7 +41,7 @@
   const request=async(path,options={})=>{
     if(!apiBase)throw Object.assign(new Error('The secure backend has not been connected yet.'),{code:'NOT_CONFIGURED'});
     const method=options.method||'GET',headers={Accept:'application/json',...(options.headers||{})};
-    if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
+    if(options.body&&!(options.body instanceof FormData)&&!headers['Content-Type'])headers['Content-Type']='application/json';
     if(!['GET','HEAD','OPTIONS'].includes(method)&&csrfToken)headers['X-CSRF-Token']=csrfToken;
     const response=await fetch(`${apiBase}${path}`,{...options,method,headers,credentials:'include'});
     const data=await response.json().catch(()=>({}));
@@ -52,8 +52,16 @@
   window.ACECMS={
     defaults:clone(defaults),uid,apiBase,isConfigured:Boolean(apiBase),
     async getContent(){try{return clone(await request('/content'))}catch(error){console.warn('Using bundled website content:',error.message);return clone(defaults)}},
-    async saveContent(content){return request('/content',{method:'PUT',body:JSON.stringify(clone(content))})},
-    async resetContent(){return request('/content',{method:'PUT',body:JSON.stringify(clone(defaults))})},
+    async getAdminContent(){return clone(await request('/admin/content'))},
+    async saveContent(content){return request('/admin/content',{method:'PUT',body:JSON.stringify(clone(content))})},
+    async resetContent(){return request('/admin/content',{method:'PUT',body:JSON.stringify(clone(defaults))})},
+    async uploadImage(file,metadata={}){
+      const body=new FormData();
+      body.append('image',file,file.name);
+      Object.entries(metadata).forEach(([key,value])=>body.append(key,String(value??'')));
+      return request('/media',{method:'POST',body});
+    },
+    async deleteImage(id){return request(`/media/${encodeURIComponent(id)}`,{method:'DELETE'})},
     async login(email,password){return request('/auth/login',{method:'POST',body:JSON.stringify({email,password})})},
     async getSession(){try{return await request('/auth/session')}catch(error){if(error.status===401||error.code==='NOT_CONFIGURED')return null;throw error}},
     async logout(){try{return await request('/auth/logout',{method:'POST'})}finally{csrfToken=''}}
