@@ -1,8 +1,15 @@
 document.addEventListener('DOMContentLoaded',async()=>{
   if(!window.ACECMS||!(await ACECMS.getSession())){window.location.replace('login.html');return}
-  let content=await ACECMS.getAdminContent(),editType='',editId='';
-  if(!Array.isArray(content.jobs))content.jobs=structuredClone(ACECMS.defaults.jobs||[]);
   const editor=document.querySelector('[data-admin-editor]'),editorForm=document.querySelector('[data-admin-editor-form]'),fields=document.querySelector('[data-editor-fields]'),state=document.querySelector('[data-admin-state]');
+  let content,editType='',editId='';
+  try{content=await ACECMS.getAdminContent()}
+  catch(error){
+    state.textContent='The content service is unavailable. Check that the Render API is live and connected to Supabase, then refresh this page.';
+    state.classList.add('changed','error');
+    document.querySelectorAll('[data-admin-add],[data-admin-reset],[data-admin-migrate]').forEach(button=>{button.disabled=true});
+    return;
+  }
+  if(!Array.isArray(content.jobs))content.jobs=structuredClone(ACECMS.defaults.jobs||[]);
   const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   const imageOrFallback=(value,label)=>value?`<img src="${escapeHtml(value)}" alt="${escapeHtml(label)}">`:`<span class="admin-image-placeholder">No image</span>`;
   const setState=message=>{state.textContent=message;state.classList.add('changed');setTimeout(()=>state.classList.remove('changed'),1600)};
@@ -36,7 +43,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const upload=async(file,category,data,altText)=>ACECMS.uploadImage(file,{category,altText,rightsStatus:data.get('rightsStatus')||'company_owned',rightsNote:data.get('rightsNote')||'',sourceKind:'admin_upload'});
   const save=async()=>{await ACECMS.saveContent(content);render();setState('Changes saved. Refresh the public page to see them.')};
   const migration=document.querySelector('[data-admin-migration]'),needsMigration=()=>content.persistence?.source==='bundled';
-  migration.hidden=!needsMigration();
+  const updateMigrationState=()=>{
+    const locked=needsMigration();
+    migration.hidden=!locked;
+    document.querySelectorAll('[data-admin-add],[data-admin-reset]').forEach(button=>{
+      button.disabled=locked;
+      button.title=locked?'Complete the one-time Supabase migration first.':'';
+    });
+    if(locked)setState('Complete the one-time image migration before editing website content.');
+  };
+  updateMigrationState();
   const fetchRepositoryFile=async source=>{const response=await fetch(new URL(source,document.baseURI));if(!response.ok)throw new Error(`Could not read ${source}.`);const blob=await response.blob();return new File([blob],source.split('/').pop()||'image',{type:blob.type||'image/png'})};
   const migrateRepositoryContent=async()=>{
     if(!document.querySelector('[data-migration-company-rights]').checked)throw new Error('Confirm the publishing rights for the current ACE photos first.');
@@ -54,7 +70,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     for(const blog of migrated.blogs){const originalCover=blog.cover,cover=await migrate(originalCover,'blog',blog.title);blog.cover=cover.url;blog.coverMediaId=cover.id;blog.gallery=[];blog.images=[];for(const source of (content.blogs.find(item=>item.id===blog.id)?.images||[])){const asset=await migrate(source,'blog',`${blog.title} gallery image`);blog.gallery.push({mediaId:asset.id,url:asset.url,caption:''});blog.images.push(asset.url)}blog.status='published'}
     delete migrated.persistence;
     content=await ACECMS.saveContent(migrated);
-    migration.hidden=true;render();setState(`${uploaded.length} optimized images migrated and verified. Repository originals were kept.`);
+    updateMigrationState();render();setState(`${uploaded.length} optimized images migrated and verified. Repository originals were kept.`);
   };
   document.querySelector('[data-admin-migrate]').addEventListener('click',async event=>{event.currentTarget.disabled=true;try{await migrateRepositoryContent()}catch(error){alert(error.message);setState(error.message)}finally{event.currentTarget.disabled=false}});
   document.querySelectorAll('[data-admin-tab]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-admin-tab]').forEach(item=>item.classList.toggle('active',item===button));document.querySelectorAll('[data-admin-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.adminPanel===button.dataset.adminTab))}));
