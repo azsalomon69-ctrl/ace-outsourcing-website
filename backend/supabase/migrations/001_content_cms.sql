@@ -117,6 +117,7 @@ create table if not exists public.jobs (
   employment_type text not null,
   location text not null,
   work_setup text not null default 'onsite' check (work_setup in ('onsite','hybrid','remote')),
+  application_url text check (application_url is null or application_url ~ '^https://'),
   summary text not null,
   description text not null default '',
   responsibilities jsonb not null default '[]'::jsonb check (jsonb_typeof(responsibilities) = 'array'),

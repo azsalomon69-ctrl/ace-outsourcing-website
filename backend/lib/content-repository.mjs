@@ -73,7 +73,7 @@ export async function loadContentFromDatabase({includeUnpublished=false}={}){
     }),
     jobs:jobs.map(item=>({
       id:item.id,slug:item.slug,title:item.title,department:item.department,category:categoryToUi[item.category]||'operations',
-      employmentType:item.employment_type,location:item.location,workSetup:item.work_setup,priority:tierToUi[item.hiring_tier]||'open',
+      employmentType:item.employment_type,location:item.location,workSetup:item.work_setup,applicationUrl:item.application_url||'',priority:tierToUi[item.hiring_tier]||'open',
       summary:item.summary,description:item.description,responsibilities:item.responsibilities||[],qualifications:item.qualifications||[],
       image:media.get(item.image_media_id)?.url||'',imageMediaId:item.image_media_id||null,status:item.status,
       publishedAt:item.published_at,closesAt:item.closes_at,displayOrder:item.display_order
@@ -138,7 +138,7 @@ async function saveJobs(items){
     const item=items[index],status=['draft','open','closed','archived'].includes(item.status)?item.status:'open';
     const row={slug:slugify(item.slug||item.id||item.title),title:item.title,category:categoryToDb[item.category]||'operations_people',
       department:item.department,employment_type:item.employmentType,location:item.location||'Santa Rosa, Laguna',
-      work_setup:['onsite','hybrid','remote'].includes(item.workSetup)?item.workSetup:(/hybrid/i.test(item.location||'')?'hybrid':'onsite'),
+      work_setup:['onsite','hybrid','remote'].includes(item.workSetup)?item.workSetup:(/hybrid/i.test(item.location||'')?'hybrid':'onsite'),application_url:item.applicationUrl||null,
       summary:item.summary||'',description:item.description||item.summary||'',responsibilities:item.responsibilities||[],qualifications:item.qualifications||[],
       hiring_tier:tierToDb[item.priority]||'accepting',status,image_media_id:item.imageMediaId||null,published_at:publishedAt(item,status,'open'),
       closes_at:item.closesAt||null,display_order:index};

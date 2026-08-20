@@ -1,6 +1,6 @@
 # Supabase content storage
 
-`migrations/001_content_cms.sql` is the approved content and media schema for the ACE website.
+The files in `migrations/` are the approved content and media schema for the ACE website. Run them in numerical order.
 
 The migration intentionally creates no browser-facing table policies. Public pages continue to call the Render API, and only Render receives `SUPABASE_SECRET_KEY`.
 
@@ -16,7 +16,7 @@ The SQL migration must be applied before enabling database-backed editing. Repos
 
 ## Deployment order
 
-1. In the Supabase SQL Editor, run `migrations/001_content_cms.sql` once for the production project.
+1. In the Supabase SQL Editor, run each migration in numerical order. Existing projects must run `002_job_application_url.sql`; new projects should run both `001_content_cms.sql` and `002_job_application_url.sql`.
 2. Confirm the six content tables exist and the public `site-media` bucket exists.
 3. Keep `SUPABASE_SECRET_KEY` only in Render. It must never be added to Vercel, `frontend/config.js`, browser JavaScript, or Git.
 4. Deploy the Render API, then confirm `/health` reports `database: configured`.
