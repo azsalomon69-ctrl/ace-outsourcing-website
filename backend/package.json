@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node server.mjs",
     "check": "node --check server.mjs && node --check lib/content-repository.mjs && node --check lib/media-service.mjs && node --check lib/supabase.mjs",
+    "test:login-entry": "node scripts/test-login-entry.mjs",
     "audit-images": "node scripts/audit-images.mjs",
     "optimize-static-images": "node scripts/optimize-static-images.mjs",
     "hash-password": "node scripts/hash-password.mjs"

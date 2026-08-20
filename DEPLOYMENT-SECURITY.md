@@ -23,6 +23,7 @@ The root `render.yaml` declares the variable names but contains no secret values
 - `SUPABASE_SECRET_KEY`: the server-only Supabase secret key. Never use an anonymous or publishable key for privileged CMS writes.
 - `SUPABASE_STORAGE_BUCKET`: the public website-media bucket name, currently `site-media`.
 - `MAX_UPLOAD_BYTES` and `IMAGE_TARGET_KB`: server-side upload and quality-aware optimization settings.
+- `LOGIN_ENTRY_GRANT_SECONDS` (optional): login-interface grant lifetime. It defaults to 120 seconds and is constrained to 30–300 seconds in production.
 
 If Google integrations are built later, their credentials must be added to Render only.
 
@@ -42,7 +43,7 @@ The production login is handled by the Render backend, not JavaScript stored in 
 - Protect all admin and content-management API routes with server-side authorization.
 - Add an audit log before multiple administrators or sensitive applicant workflows are enabled. Never log passwords, cookies, applicant data, or access tokens.
 
-The hidden ten-click footer shortcut is only a convenience. It is not a security control. The backend must reject every unauthenticated admin request even when somebody knows the login URL.
+The discreet ten-click footer interaction is only an entry gate for the login interface, not authentication. Each valid interaction advances short-lived state in a signed, requester-bound, `HttpOnly`, `Secure`, `SameSite=Strict` cookie. The completed gate expires after two minutes by default, permits only the login interface, and is deleted after successful authentication. Direct login-interface checks and login submissions without a valid gate receive the same generic not-found response. The backend still rejects every unauthenticated admin request even when somebody knows the URL or reproduces the entry interaction.
 
 The Render API URL is configured in `frontend/config.js`. Login and admin pages are served by Vercel while all authentication and content-management authorization is enforced by Render.
 

@@ -17,6 +17,12 @@ const frontendOrigin=String(process.env.FRONTEND_ORIGIN||'').replace(/\/$/,'');
 const defaultFile=resolve('data/default-content.json');
 const sessionHours=Math.max(1,Math.min(24,Number(process.env.SESSION_HOURS)||8));
 const loginAttempts=new Map();
+const loginEntryAttempts=new Map();
+const loginEntryClicks=10;
+const loginEntryWindowMs=15_000;
+const loginEntryMinIntervalMs=60;
+const requestedLoginEntrySeconds=Number(process.env.LOGIN_ENTRY_GRANT_SECONDS)||120;
+const loginEntryGrantMs=Math.max(production?30:1,Math.min(300,requestedLoginEntrySeconds))*1000;
 
 function assertConfiguration(){
   const missing=[];
@@ -74,6 +80,18 @@ function cookies(request){
 }
 
 function sign(value){return createHmac('sha256',sessionSecret).update(value).digest('base64url')}
+function signedToken(data){
+  const payload=Buffer.from(JSON.stringify(data)).toString('base64url');
+  return `${payload}.${sign(payload)}`;
+}
+function verifySignedToken(token){
+  const [payload,signature]=String(token||'').split('.');
+  if(!payload||!signature)return null;
+  const expected=Buffer.from(sign(payload));
+  const actual=Buffer.from(signature);
+  if(expected.length!==actual.length||!timingSafeEqual(expected,actual))return null;
+  try{return JSON.parse(Buffer.from(payload,'base64url').toString('utf8'))}catch{return null}
+}
 function createSession(){
   const csrf=randomBytes(24).toString('base64url');
   const payload=Buffer.from(JSON.stringify({csrf,expires:Date.now()+sessionHours*60*60*1000,nonce:randomBytes(16).toString('base64url')})).toString('base64url');
@@ -82,16 +100,16 @@ function createSession(){
 function verifySession(request){
   const token=cookies(request).ace_session;
   if(!token)return null;
-  const [payload,signature]=token.split('.');
-  if(!payload||!signature)return null;
-  const expected=Buffer.from(sign(payload));
-  const actual=Buffer.from(signature);
-  if(expected.length!==actual.length||!timingSafeEqual(expected,actual))return null;
-  try{const session=JSON.parse(Buffer.from(payload,'base64url').toString('utf8'));return session.csrf&&session.expires>Date.now()?session:null}catch{return null}
+  const session=verifySignedToken(token);
+  return session?.csrf&&session.expires>Date.now()?session:null;
 }
 function sessionCookie(token,maxAge=sessionHours*60*60){
   const path=production?'/api':'/';
   return `ace_session=${encodeURIComponent(token)}; Path=${path}; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${production?'; Secure':''}`;
+}
+function temporaryCookie(name,token,maxAge){
+  const path=production?'/api':'/';
+  return `${name}=${encodeURIComponent(token)}; Path=${path}; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${production?'; Secure':''}`;
 }
 function requireSession(request,response,csrf=false){
   const session=verifySession(request);
@@ -111,6 +129,44 @@ async function verifyPassword(password){
 }
 
 function clientAddress(request){return String(request.headers['x-forwarded-for']||request.socket.remoteAddress||'unknown').split(',')[0].trim()}
+function requestBinding(request){
+  return sign(`${clientAddress(request)}\n${String(request.headers['user-agent']||'').slice(0,512)}`);
+}
+function trustedLoginEntryRequest(request){
+  const origin=String(request.headers.origin||'');
+  const localAllowed=!production&&/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  const fetchSite=String(request.headers['sec-fetch-site']||'');
+  return (origin===frontendOrigin||localAllowed)&&(!fetchSite||fetchSite==='same-origin'||fetchSite==='same-site');
+}
+function canAttemptLoginEntry(request){
+  const key=clientAddress(request),now=Date.now(),windowMs=5*60*1000;
+  const record=loginEntryAttempts.get(key);
+  if(!record||now-record.started>windowMs){loginEntryAttempts.set(key,{started:now,count:1});return true}
+  record.count+=1;
+  return record.count<=60;
+}
+function loginEntryAllowed(request){
+  const grant=verifySignedToken(cookies(request).ace_login_access);
+  return Boolean(grant?.purpose==='login-entry'&&grant.expires>Date.now()&&grant.binding===requestBinding(request));
+}
+function advanceLoginEntry(request,response){
+  if(!trustedLoginEntryRequest(request)||!canAttemptLoginEntry(request)){sendJson(response,404,{error:'Not found.'});return}
+  const now=Date.now(),binding=requestBinding(request),current=verifySignedToken(cookies(request).ace_login_clicks);
+  let count=1,started=now;
+  if(current?.purpose==='login-clicks'&&current.binding===binding&&current.expires>now){
+    const interval=now-current.last;
+    if(interval>=loginEntryMinIntervalMs&&now-current.started<=loginEntryWindowMs){count=current.count+1;started=current.started}
+  }
+  if(count===loginEntryClicks){
+    const grant=signedToken({purpose:'login-entry',binding,expires:now+loginEntryGrantMs,nonce:randomBytes(18).toString('base64url')});
+    response.setHeader('Set-Cookie',[temporaryCookie('ace_login_access',grant,Math.ceil(loginEntryGrantMs/1000)),temporaryCookie('ace_login_clicks','',0)]);
+    sendJson(response,200,{unlocked:true});return;
+  }
+  if(count>loginEntryClicks)count=1;
+  const progress=signedToken({purpose:'login-clicks',binding,count,started,last:now,expires:started+loginEntryWindowMs,nonce:randomBytes(12).toString('base64url')});
+  response.setHeader('Set-Cookie',temporaryCookie('ace_login_clicks',progress,Math.ceil(loginEntryWindowMs/1000)));
+  sendJson(response,200,{unlocked:false});
+}
 function canAttemptLogin(request){
   const key=clientAddress(request),now=Date.now(),windowMs=15*60*1000;
   const record=loginAttempts.get(key);
@@ -162,13 +218,19 @@ async function handler(request,response){
   try{
     if(request.method==='GET'&&url.pathname==='/health'){sendJson(response,200,{status:'ok',database:supabaseConfigured?'configured':'missing'});return}
     if(request.method==='GET'&&url.pathname==='/content'){sendJson(response,200,await loadPublicContent());return}
+    if(request.method==='POST'&&url.pathname==='/auth/login-entry/click'){advanceLoginEntry(request,response);return}
+    if(request.method==='GET'&&url.pathname==='/auth/login-entry'){
+      if(!loginEntryAllowed(request)){sendJson(response,404,{error:'Not found.'});return}
+      sendJson(response,200,{allowed:true});return;
+    }
     if(request.method==='POST'&&url.pathname==='/auth/login'){
+      if(!loginEntryAllowed(request)){sendJson(response,404,{error:'Not found.'});return}
       if(!canAttemptLogin(request)){response.setHeader('Retry-After','900');sendJson(response,429,{error:'Too many login attempts. Try again later.'});return}
       const body=await readJson(request,16*1024),email=String(body.email||'').trim().toLowerCase();
       if(email!==adminEmail||!(await verifyPassword(body.password))){await new Promise(resolve=>setTimeout(resolve,350));sendJson(response,401,{error:'Email or password is incorrect.'});return}
       clearAttempts(request);
       const session=createSession();
-      response.setHeader('Set-Cookie',sessionCookie(session.token));
+      response.setHeader('Set-Cookie',[sessionCookie(session.token),temporaryCookie('ace_login_access','',0),temporaryCookie('ace_login_clicks','',0)]);
       sendJson(response,200,{authenticated:true,email:adminEmail,csrfToken:session.csrf});return;
     }
     if(request.method==='GET'&&url.pathname==='/auth/session'){

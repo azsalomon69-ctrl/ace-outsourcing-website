@@ -62,6 +62,8 @@
       return request('/media',{method:'POST',body});
     },
     async deleteImage(id){return request(`/media/${encodeURIComponent(id)}`,{method:'DELETE'})},
+    async registerLoginEntryClick(){return request('/auth/login-entry/click',{method:'POST'})},
+    async hasLoginEntryAccess(){try{return Boolean((await request('/auth/login-entry')).allowed)}catch(error){if(error.status===404||error.code==='NOT_CONFIGURED')return false;throw error}},
     async login(email,password){return request('/auth/login',{method:'POST',body:JSON.stringify({email,password})})},
     async getSession(){try{return await request('/auth/session')}catch(error){if(error.status===401||error.code==='NOT_CONFIGURED')return null;throw error}},
     async logout(){try{return await request('/auth/logout',{method:'POST'})}finally{csrfToken=''}}

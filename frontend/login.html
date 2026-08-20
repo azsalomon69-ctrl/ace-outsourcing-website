@@ -8,8 +8,14 @@
   <link rel="icon" type="image/png" href="assets/ACE.png">
   <link rel="stylesheet" href="ace.css">
 </head>
-<body class="login-page">
-  <main class="login-shell">
+<body class="login-page login-gate-pending">
+  <main class="not-found-shell" data-login-not-found>
+    <span class="eyebrow">Page not found</span>
+    <h1>Nothing to see here.</h1>
+    <p>The page you requested could not be found.</p>
+    <a class="btn btn-dark" href="index.html">Return home</a>
+  </main>
+  <main class="login-shell" data-login-shell hidden>
     <a class="login-brand" href="index.html">
       <img src="assets/ACE.png" alt="ACE Outsource Solutions">
       <span><strong>ACE Outsource Solutions</strong><span>Expert Service, Beyond Borders</span></span>

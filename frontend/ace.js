@@ -13,8 +13,19 @@ document.addEventListener('DOMContentLoaded',async()=>{
   else{const lottieScript=document.createElement('script');lottieScript.src='vendor/lottiefiles/lottie-player.js';lottieScript.defer=true;lottieScript.addEventListener('load',revealLottie,{once:true});document.head.append(lottieScript)}
  }
  const hiddenLoginTrigger=document.querySelector('[data-hidden-login-trigger]');
- let hiddenLoginClicks=0;
- hiddenLoginTrigger?.addEventListener('click',()=>{hiddenLoginClicks+=1;if(hiddenLoginClicks>=10)window.location.assign('login.html')});
+ let hiddenLoginClickQueue=Promise.resolve(),hiddenLoginNavigating=false;
+ hiddenLoginTrigger?.addEventListener('click',()=>{
+  if(hiddenLoginNavigating)return;
+  hiddenLoginClickQueue=hiddenLoginClickQueue.then(async()=>{
+   try{
+    const apiBase=String(window.ACE_CONFIG?.apiBase||'/api').replace(/\/$/,'');
+    const response=await fetch(`${apiBase}/auth/login-entry/click`,{method:'POST',credentials:'include',headers:{Accept:'application/json'}});
+    if(!response.ok)return;
+    const result=await response.json();
+    if(result.unlocked){hiddenLoginNavigating=true;window.location.assign('login.html')}
+   }catch{}
+  });
+ });
  const backToTop=document.createElement('button');
  backToTop.type='button';backToTop.className='back-to-top';backToTop.setAttribute('aria-label','Back to top');backToTop.innerHTML='<span aria-hidden="true">↑</span>';
  document.body.append(backToTop);

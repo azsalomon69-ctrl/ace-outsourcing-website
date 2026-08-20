@@ -8,6 +8,8 @@ This is a factual implementation audit, not a claim of compliance with every law
 
 | Cookie | Classification | Set by | Purpose | Production attributes | Expiry |
 | --- | --- | --- | --- | --- | --- |
+| `ace_login_clicks` | Strictly necessary | ACE Render API through the same-origin Vercel `/api` proxy | Signed, requester-bound progress for the discreet login-interface interaction; it is not authentication | `HttpOnly`; `Secure`; `SameSite=Strict`; `Path=/api`; no `Domain` attribute | 15 seconds, or immediate deletion when the interaction completes |
+| `ace_login_access` | Strictly necessary | ACE Render API through the same-origin Vercel `/api` proxy | Signed, requester-bound permission to display and submit the login interface; it grants no administrator privileges | `HttpOnly`; `Secure`; `SameSite=Strict`; `Path=/api`; no `Domain` attribute | 2 minutes by default, or immediate deletion after successful authentication |
 | `ace_session` | Strictly necessary | ACE Render API through the same-origin Vercel `/api` proxy | Signed administrator session and CSRF binding | `HttpOnly`; `Secure`; `SameSite=Lax`; `Path=/api`; no `Domain` attribute | Maximum 8 hours, or immediate deletion on logout |
 | `ace_privacy_choice` | Preference | ACE public website | Remembers whether optional Google Street View may load | `Secure` on HTTPS; `SameSite=Lax`; website path | Maximum 180 days |
 
@@ -35,13 +37,14 @@ The client and careers forms are currently prototypes. Their fields and selected
 
 ## Consent conclusion for the current build
 
-The current build has one strictly necessary admin-session cookie, one Street View preference cookie, and no analytics or advertising trackers. The branded privacy-choice panel controls whether optional Google Street View loads.
+The current build has two very short-lived cookies for the login-interface entry flow, one administrator-session cookie, one Street View preference cookie, and no analytics or advertising trackers. The login-entry cookies do not authenticate a visitor or grant administrator access. The branded privacy-choice panel controls whether optional Google Street View loads.
 
 This conclusion must be revisited for the actual deployment jurisdictions and before any non-essential technology is enabled.
 
 ## Security findings implemented
 
 - The session cookie is first-party through `/api`, scoped to `/api`, signed, `HttpOnly`, `Secure`, and `SameSite=Lax` in production.
+- The login-interface cookies are first-party through `/api`, requester-bound, signed, `HttpOnly`, `Secure`, and `SameSite=Strict` in production. They expire after 15 seconds and 2 minutes respectively and cannot authorize an admin API operation.
 - The cookie expires after no more than eight hours and is cleared using the same path on logout.
 - The session payload no longer includes the administrator email address.
 - Login rate limiting retains an IP address and attempt count in process memory for at most 15 minutes.
