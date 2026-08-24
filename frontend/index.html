@@ -6,16 +6,7 @@
     <meta name="description" content="ACE Outsource Solutions provides scalable BPO, seat leasing, recruitment and talent sourcing services from the Philippines.">
     <title>ACE Outsource Solutions | Expert Service, Beyond Borders</title>
     <link rel="icon" type="image/png" href="assets/ACE.png">
-    <script>
-        try {
-            const navigation = performance.getEntriesByType('navigation')[0];
-            const arrivedInternally = sessionStorage.getItem('aceInternalNavigation') === '1';
-            sessionStorage.removeItem('aceInternalNavigation');
-            if (navigation?.type === 'reload' || (navigation?.type !== 'back_forward' && !arrivedInternally)) document.documentElement.classList.add('opening-splash-active');
-        } catch {
-            document.documentElement.classList.add('opening-splash-active');
-        }
-    </script>
+    <script src="startup.js"></script>
     <link rel="stylesheet" href="ace.css">
     <link rel="preload" as="image" href="assets/responsive/hero-headset-1280w.webp" imagesrcset="assets/responsive/hero-headset-768w.webp 768w, assets/responsive/hero-headset-1280w.webp 1280w" imagesizes="(max-width: 900px) calc(100vw - 40px), 50vw" fetchpriority="high">
 </head>

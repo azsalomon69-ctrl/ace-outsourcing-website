@@ -33,7 +33,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(footer?.id==='site-footer')footer.querySelector('.footer')?.removeAttribute('id');
  const iconMotionReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  const ensureLottiePlayer=()=>new Promise((resolve,reject)=>{if(customElements.get('lottie-player')){resolve();return}const existing=document.querySelector('script[data-local-lottie]');if(existing){customElements.whenDefined('lottie-player').then(resolve);return}const script=document.createElement('script');script.src='vendor/lottiefiles/lottie-player.js';script.async=true;script.dataset.localLottie='';script.addEventListener('load',()=>customElements.whenDefined('lottie-player').then(resolve),{once:true});script.addEventListener('error',reject,{once:true});document.head.append(script)});
- const startLottieIcon=player=>ensureLottiePlayer().then(()=>{if(iconMotionReduced){player.seek('100%');return}player.seek('0%');player.play()}).catch(()=>{});
+ const startLottieIcon=player=>ensureLottiePlayer().then(()=>{
+ const start=()=>{if(iconMotionReduced){player.seek('100%');return}player.seek('0%');player.play()};
+  player.addEventListener('ready',start,{once:true});
+  start();
+ }).catch(()=>{});
  const lottieObserver=!iconMotionReduced&&'IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(entry=>{if(!entry.isIntersecting)return;startLottieIcon(entry.target);lottieObserver.unobserve(entry.target)}),{threshold:.35}):null;
  const registerIconAnimation=root=>root.querySelectorAll('lottie-player.icon-animation, lottie-player.content-animation').forEach(player=>{if(lottieObserver)lottieObserver.observe(player);else startLottieIcon(player)});
  registerIconAnimation(document);
