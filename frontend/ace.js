@@ -81,10 +81,19 @@ document.addEventListener('DOMContentLoaded',async()=>{
   if(!image)return `<img class="post-image" src="${escapeHtml(source)}" alt="${safeTitle}" loading="lazy">`;
   return `<img class="post-image" src="${image.src}" srcset="${image.srcset}" sizes="(max-width: 700px) calc(100vw - 40px), 40vw" width="${image.width}" height="${image.height}" alt="${safeTitle}" loading="lazy">`;
  };
+ const quotes=[
+  {text:'We could not be happier with our team. They are loyal, hardworking and dedicated. ACE helped us lower costs while improving our sales growth.',name:'Jenny M.',company:'Be There Solutions',logo:'assets/be-there-solutions.webp'},
+  {text:'ACE helped us put a plan in place to build and scale as our platform requires more manpower. We are excited about the journey and the outcome ahead.',name:'Adam J.',company:'Figshelf',logo:'assets/figshelf.webp'},
+  {text:'From day one, ACE was professional and created a plan to recruit, onboard, train and grow my sales team. The results have been excellent.',name:'Shai A.',company:'Green Marketing',logo:'assets/green-marketing.webp'}
+ ];
+ let quoteIndex=0;const quoteText=document.querySelector('[data-quote-text]'),quoteName=document.querySelector('[data-quote-name]'),quoteCompany=document.querySelector('[data-quote-company]'),quoteLogo=document.querySelector('[data-quote-logo]'),quoteCount=document.querySelector('[data-quote-count]');
+ function showQuote(){if(!quoteText)return;const q=quotes[quoteIndex],rating=Math.max(1,Math.min(5,Number(q.rating)||5)),stars='★'.repeat(rating)+'☆'.repeat(5-rating);quoteText.textContent=q.text;quoteName.textContent=q.name;quoteCompany.textContent=q.company;if(quoteLogo){quoteLogo.hidden=false;quoteLogo.src=q.logo;quoteLogo.alt=`${q.company} logo`}document.querySelector('.quote-card .quote-stars')?.replaceChildren(document.createTextNode(stars));if(quoteCount)quoteCount.textContent=`${String(quoteIndex+1).padStart(2,'0')} / ${String(quotes.length).padStart(2,'0')}`}
+ const ratingValues=document.querySelectorAll('[data-average-rating]'),ratingStars=document.querySelector('.rating-summary .rating-stars'),average=quotes.reduce((total,quote)=>total+(Number(quote.rating)||5),0)/quotes.length;
+ ratingValues.forEach(value=>value.textContent=average.toFixed(1));if(ratingStars)ratingStars.textContent='★'.repeat(Math.round(average))+'☆'.repeat(5-Math.round(average));
+ document.querySelector('[data-quote-next]')?.addEventListener('click',()=>{quoteIndex=(quoteIndex+1)%quotes.length;showQuote()});
+ document.querySelector('[data-quote-prev]')?.addEventListener('click',()=>{quoteIndex=(quoteIndex-1+quotes.length)%quotes.length;showQuote()});showQuote();
  const cmsContent=window.ACECMS?await ACECMS.getContent():null;
  if(cmsContent){
-  const teamGrid=document.querySelector('.team-grid');
-  if(teamGrid)teamGrid.innerHTML=cmsContent.team.map(member=>`<article class="team-card"><img src="${escapeHtml(member.image)}" alt="${escapeHtml(`${member.name}, ACE ${member.role}`)}" loading="lazy"><div><small>${escapeHtml(member.role)}</small><h3>${escapeHtml(member.name)}</h3><p>“${escapeHtml(member.quote)}”</p></div></article>`).join('');
   const homeJournal=document.querySelector('.journal-grid');
   if(homeJournal)homeJournal.innerHTML=cmsContent.blogs.slice(0,3).map(post=>`<article class="post">${responsivePostImage(post.cover,post.title)}<small>${escapeHtml(post.category)}</small><h3>${escapeHtml(post.title)}</h3><a class="text-link" href="blog.html#${escapeHtml(post.id)}">Read story <span>→</span></a></article>`).join('');
   const journalList=document.querySelector('.journal-entry-list');
@@ -101,16 +110,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
  const toggle=document.querySelector('.menu-toggle'),links=document.querySelector('.nav-links');
  toggle?.addEventListener('click',()=>{const open=links.classList.toggle('open');toggle.setAttribute('aria-expanded',open);document.body.classList.toggle('menu-open',open)});
  document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>{links?.classList.remove('open');document.body.classList.remove('menu-open')}));
- const defaultQuotes=[
-  {text:'We could not be happier with our team. They are loyal, hardworking and dedicated. ACE helped us lower costs while improving our sales growth.',name:'Jenny M.',company:'Be There Solutions',logo:'assets/be-there-solutions.webp'},
-  {text:'ACE helped us put a plan in place to build and scale as our platform requires more manpower. We are excited about the journey and the outcome ahead.',name:'Adam J.',company:'Figshelf',logo:'assets/figshelf.webp'},
-  {text:'From day one, ACE was professional and created a plan to recruit, onboard, train and grow my sales team. The results have been excellent.',name:'Shai A.',company:'Green Marketing',logo:'assets/green-marketing.webp'}
- ],quotes=cmsContent?cmsContent.testimonials:defaultQuotes;
- let quoteIndex=0;const quoteText=document.querySelector('[data-quote-text]'),quoteName=document.querySelector('[data-quote-name]'),quoteCompany=document.querySelector('[data-quote-company]'),quoteLogo=document.querySelector('[data-quote-logo]'),quoteCount=document.querySelector('[data-quote-count]');
- function showQuote(){if(!quoteText)return;if(!quotes.length){quoteText.textContent='No client stories are published yet.';if(quoteName)quoteName.textContent='';if(quoteCompany)quoteCompany.textContent='';if(quoteLogo)quoteLogo.hidden=true;if(quoteCount)quoteCount.textContent='00 / 00';document.querySelector('.quote-card .quote-stars')?.replaceChildren();document.querySelector('.quote-controls')?.setAttribute('hidden','');return}const q=quotes[quoteIndex],rating=Math.max(1,Math.min(5,Number(q.rating)||5)),stars='★'.repeat(rating)+'☆'.repeat(5-rating);quoteText.textContent=q.quote||q.text;quoteName.textContent=q.name;quoteCompany.textContent=q.company;if(quoteLogo){quoteLogo.hidden=false;quoteLogo.src=q.logo;quoteLogo.alt=`${q.company} logo`}document.querySelector('.quote-card .quote-stars')?.replaceChildren(document.createTextNode(stars));if(quoteCount)quoteCount.textContent=`${String(quoteIndex+1).padStart(2,'0')} / ${String(quotes.length).padStart(2,'0')}`}
- const ratingValues=document.querySelectorAll('[data-average-rating]'),ratingStars=document.querySelector('.rating-summary .rating-stars');if(quotes.length){const average=quotes.reduce((total,quote)=>total+(Number(quote.rating)||5),0)/quotes.length;ratingValues.forEach(value=>value.textContent=average.toFixed(1));if(ratingStars)ratingStars.textContent='★'.repeat(Math.round(average))+'☆'.repeat(5-Math.round(average))}else{ratingValues.forEach(value=>value.textContent='0.0');if(ratingStars)ratingStars.textContent='☆☆☆☆☆'}
- document.querySelector('[data-quote-next]')?.addEventListener('click',()=>{if(!quotes.length)return;quoteIndex=(quoteIndex+1)%quotes.length;showQuote()});
- document.querySelector('[data-quote-prev]')?.addEventListener('click',()=>{if(!quotes.length)return;quoteIndex=(quoteIndex-1+quotes.length)%quotes.length;showQuote()});showQuote();
  const jobOpenings=[...document.querySelectorAll('.job-opening')],jobList=document.querySelector('.job-list'),wideJobs=window.matchMedia('(min-width:901px)');
  let selectedJob=jobOpenings.find(job=>job.open)||jobOpenings[0],jobPreview;
  if(jobList){jobPreview=document.createElement('aside');jobPreview.className='job-preview';jobPreview.setAttribute('aria-live','polite');jobPreview.setAttribute('aria-label','Selected job details');jobList.append(jobPreview)}

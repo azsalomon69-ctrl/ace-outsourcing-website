@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const imageOrFallback=(value,label)=>value?`<img src="${escapeHtml(value)}" alt="${escapeHtml(label)}">`:`<span class="admin-image-placeholder">No image</span>`;
   const setState=message=>{state.textContent=message;state.classList.add('changed');setTimeout(()=>state.classList.remove('changed'),1600)};
   const render=()=>{
-    document.querySelector('[data-admin-list="team"]').innerHTML=content.team.map((item,index)=>itemCard('team',item,index,item.name,item.role,item.image)).join('')||emptyState('people');
-    document.querySelector('[data-admin-list="testimonials"]').innerHTML=content.testimonials.map((item,index)=>itemCard('testimonials',item,index,item.company,item.name,item.logo)).join('')||emptyState('client stories');
     document.querySelector('[data-admin-list="blogs"]').innerHTML=content.blogs.map((item,index)=>itemCard('blogs',item,index,item.title,`${item.category} · ${item.date}`,item.cover)).join('')||emptyState('blog posts');
     document.querySelector('[data-admin-list="jobs"]').innerHTML=content.jobs.map((item,index)=>itemCard('jobs',item,index,item.title,`${priorityLabel(item.priority)} · ${item.department} · ${item.employmentType}`,'' )).join('')||emptyState('job openings');
   };

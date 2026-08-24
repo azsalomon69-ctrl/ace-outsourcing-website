@@ -143,7 +143,17 @@ async function saveJobs(items){
       hiring_tier:tierToDb[item.priority]||'accepting',status,image_media_id:item.imageMediaId||null,published_at:publishedAt(item,status,'open'),
       closes_at:item.closesAt||null,display_order:index};
     if(uuidPattern.test(item.id||''))row.id=item.id;
-    const saved=unwrap(await supabase.from('jobs').upsert(row,{onConflict:'slug'}).select('id').single(),'Job save');kept.push(saved.id);
+    let result=await supabase.from('jobs').upsert(row,{onConflict:'slug'}).select('id').single();
+    const missingApplicationUrl=result.error&&/application_url/i.test(result.error.message||'')&&/schema cache/i.test(result.error.message||'');
+    if(missingApplicationUrl&&!item.applicationUrl){
+      const {application_url:unusedApplicationUrl,...legacyRow}=row;
+      result=await supabase.from('jobs').upsert(legacyRow,{onConflict:'slug'}).select('id').single();
+    }
+    if(missingApplicationUrl&&item.applicationUrl){
+      const error=new Error('Job application links require Supabase migration 002_job_application_url.sql before they can be saved.');
+      error.status=503;throw error;
+    }
+    const saved=unwrap(result,'Job save');kept.push(saved.id);
   }
   await deleteAbsent('jobs',kept);
 }
