@@ -29,7 +29,7 @@ export async function loadContentFromDatabase({includeUnpublished=false}={}){
   assertSupabaseConfiguration();
   let employeeQuery=supabase.from('employees').select('*').order('display_order').order('created_at');
   let testimonialQuery=supabase.from('testimonials').select('*').order('display_order').order('created_at');
-  let blogQuery=supabase.from('blogs').select('*').order('published_at',{ascending:false}).order('created_at',{ascending:false});
+  let blogQuery=supabase.from('blogs').select('*').order('published_at',{ascending:false}).order('display_order').order('created_at');
   let jobQuery=supabase.from('jobs').select('*').order('display_order').order('created_at');
   if(!includeUnpublished){
     employeeQuery=employeeQuery.eq('status','published');
@@ -67,7 +67,7 @@ export async function loadContentFromDatabase({includeUnpublished=false}={}){
     })),
     blogs:blogs.map(item=>{
       const images=galleries.get(item.id)||[];
-      return {id:item.id,slug:item.slug,title:item.title,category:item.category,author:item.author_name,date:formatDate(item.published_at),
+      return {id:item.id,slug:item.slug,title:item.title,category:item.category,author:item.author_name,date:formatDate(item.published_at),displayOrder:item.display_order,
         publishedAt:item.published_at,excerpt:item.excerpt,body:blocksToBody(item.content),cover:media.get(item.cover_media_id)?.url||'',
         coverMediaId:item.cover_media_id||null,images:images.map(image=>image.url),gallery:images,status:item.status};
     }),
@@ -118,10 +118,11 @@ async function saveTestimonials(items){
 
 async function saveBlogs(items){
   const kept=[];
-  for(const item of items){
+  for(let index=0;index<items.length;index++){
+    const item=items[index];
     const status=['draft','published','archived'].includes(item.status)?item.status:'published';
     const row={slug:slugify(item.slug||item.id||item.title),title:item.title,category:item.category||'Team culture',excerpt:item.excerpt||'',
-      content:contentBlocks(item.body),author_name:item.author||'ACE Team',cover_media_id:item.coverMediaId||null,status,
+      content:contentBlocks(item.body),author_name:item.author||'ACE Team',cover_media_id:item.coverMediaId||null,display_order:index,status,
       published_at:publishedAt(item,status)};
     if(uuidPattern.test(item.id||''))row.id=item.id;
     const saved=unwrap(await supabase.from('blogs').upsert(row,{onConflict:'slug'}).select('id').single(),'Blog save');kept.push(saved.id);

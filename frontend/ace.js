@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
   consentBanner.innerHTML=`<div class="cookie-consent-icon" aria-hidden="true">${staticIcons.privacy}</div><div class="cookie-consent-copy"><span>Privacy choices</span><strong>Your visit, your choice.</strong><p>ACE uses a necessary preference cookie. Allowing optional services also enables the interactive Google Street View on our contact page.</p><a href="privacy.html">Read privacy details</a></div><div class="cookie-consent-actions"><button class="btn cookie-necessary" type="button" data-consent="necessary">Necessary only</button><button class="btn btn-dark" type="button" data-consent="all">Accept and show Street View</button></div>`;
   document.body.append(consentBanner);
   registerIconAnimation(consentBanner);
-  consentBanner.querySelector('[data-consent="necessary"]')?.addEventListener('click',()=>{saveConsentChoice('necessary');consentBanner.remove()});
-  consentBanner.querySelector('[data-consent="all"]')?.addEventListener('click',()=>{acceptGoogleServices();consentBanner.remove()});
+  consentBanner.querySelector('[data-consent="necessary"]')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();saveConsentChoice('necessary');consentBanner.remove()});
+  consentBanner.querySelector('[data-consent="all"]')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();acceptGoogleServices();consentBanner.remove()});
  }
  const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
  const responsiveImages={
@@ -178,8 +178,19 @@ document.addEventListener('DOMContentLoaded',async()=>{
     previous.type='button';previous.className='journal-carousel-button previous';previous.setAttribute('aria-label','Previous photo');previous.innerHTML='&#8592;';
     next.type='button';next.className='journal-carousel-button next';next.setAttribute('aria-label','Next photo');next.innerHTML='&#8594;';
     counter.className='journal-carousel-counter';counter.setAttribute('aria-live','polite');
-    const showPhoto=index=>{current=(index+photos.length)%photos.length;photos.forEach((photo,photoIndex)=>photo.classList.toggle('active',photoIndex===current));counter.textContent=`${current+1} / ${photos.length}`};
-    previous.addEventListener('click',()=>showPhoto(current-1));next.addEventListener('click',()=>showPhoto(current+1));
+    previous.dataset.carouselControl='previous';next.dataset.carouselControl='next';
+    const showPhoto=index=>{
+     current=(index+photos.length)%photos.length;
+     photos.forEach((photo,photoIndex)=>{
+      const isCurrent=photoIndex===current;
+      photo.classList.toggle('active',isCurrent);
+      photo.hidden=!isCurrent;
+      photo.setAttribute('aria-hidden',String(!isCurrent));
+     });
+     counter.textContent=`${current+1} / ${photos.length}`;
+    };
+    previous.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();showPhoto(current-1)});
+    next.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();showPhoto(current+1)});
     gallery.append(previous,next,counter);showPhoto(0);
    });
    if(!journalModal.open)journalModal.showModal();
@@ -189,7 +200,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   journalEntries.forEach(entry=>entry.querySelector('summary')?.addEventListener('click',event=>{event.preventDefault();openJournal(entry)}));
   journalModal.querySelector('.journal-modal-close')?.addEventListener('click',()=>journalModal.close());
   journalModal.addEventListener('click',event=>{if(event.target===journalModal)journalModal.close()});
-  journalModal.addEventListener('keydown',event=>{if(event.key==='ArrowLeft')journalModal.querySelector('.journal-carousel-button.previous')?.click();if(event.key==='ArrowRight')journalModal.querySelector('.journal-carousel-button.next')?.click()});
+  journalModal.addEventListener('keydown',event=>{if(event.key==='ArrowLeft')journalModal.querySelector('[data-carousel-control="previous"]')?.click();if(event.key==='ArrowRight')journalModal.querySelector('[data-carousel-control="next"]')?.click()});
   journalModal.addEventListener('close',()=>document.body.classList.remove('modal-open'));
   if(location.hash){const linkedEntry=document.querySelector(location.hash);if(linkedEntry?.classList.contains('journal-entry'))openJournal(linkedEntry)}
  }
