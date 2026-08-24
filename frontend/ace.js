@@ -1,30 +1,43 @@
 document.addEventListener('DOMContentLoaded',async()=>{
  const page=document.body.dataset.page||'';
+ try{if(page!=='home')sessionStorage.removeItem('aceInternalNavigation')}catch{}
+ document.addEventListener('click',event=>{
+  if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  const link=event.target.closest('a[href]');
+  if(!link||link.target==='_blank'||link.hasAttribute('download'))return;
+  try{
+   const destination=new URL(link.href,window.location.href);
+   if(destination.origin===window.location.origin&&(destination.pathname!==window.location.pathname||destination.search!==window.location.search))sessionStorage.setItem('aceInternalNavigation','1');
+  }catch{}
+ },true);
+ const openingSplash=document.querySelector('[data-opening-splash]');
+ if(openingSplash){
+  if(document.documentElement.classList.contains('opening-splash-active')){
+   const dismissSplash=()=>{document.documentElement.classList.remove('opening-splash-active');openingSplash.remove()};
+   const finishSplash=event=>{if(event.target!==openingSplash)return;openingSplash.removeEventListener('animationend',finishSplash);dismissSplash()};
+   openingSplash.addEventListener('animationend',finishSplash);
+   window.setTimeout(dismissSplash,2200);
+  }else openingSplash.remove();
+ }
  const header=document.querySelector('[data-site-header]');
  const footer=document.querySelector('[data-site-footer]');
  const nav=[['index.html','Home','home'],['about.html','About','about'],['services.html','Services','services'],['careers.html','Careers','careers'],['blog.html','Journal','blog']];
+ const staticIcons={
+  explore:'<lottie-player class="icon-animation" src="assets/icons/Way.json" background="transparent" speed="1" loop></lottie-player>',
+  services:'<lottie-player class="icon-animation" src="assets/icons/Service.json" background="transparent" speed="1" loop></lottie-player>',
+  contact:'<lottie-player class="icon-animation" src="assets/icons/Calling V3.json" background="transparent" speed="1" loop></lottie-player>',
+  privacy:'<lottie-player class="icon-animation" src="assets/icons/Security Cam.json" background="transparent" speed="1" loop></lottie-player>'
+ };
  if(header)header.innerHTML=`<header class="site-header"><div class="container nav"><a class="brand" href="index.html"><img src="assets/ACE.png" alt="ACE Outsource Solutions"><strong>ACE Outsource Solutions</strong><small>Expert Service, Beyond Borders</small></a><button class="menu-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button><nav class="nav-links" aria-label="Main navigation">${nav.map(n=>`<a href="${n[0]}" class="${page===n[2]?'active':''}">${n[1]}</a>`).join('')}<a class="btn btn-dark" href="contact.html">Let’s talk <span>↗</span></a></nav></div></header>`;
- if(footer)footer.innerHTML=`<footer class="footer" id="site-footer"><div class="footer-motion" aria-hidden="true"><span class="footer-orbit footer-orbit-a"></span><span class="footer-orbit footer-orbit-b"></span><span class="footer-glow"></span></div><div class="container"><div class="footer-grid"><div class="footer-brand"><a class="brand" href="index.html"><span class="footer-brand-mark"><img src="assets/ACE.png" alt=""><span class="footer-brand-pulse" aria-hidden="true"></span></span><strong>ACE Outsource Solutions</strong><small>Expert Service, Beyond Borders</small></a><p>Flexible people and operations support for ambitious businesses, built in Laguna and delivered worldwide.</p></div><div class="footer-column"><h4><span class="footer-icon" aria-hidden="true"><span class="footer-icon-fallback">↗</span><lottie-player class="footer-lottie" src="assets/lottie-compass.json" background="transparent" speed="1" loop autoplay></lottie-player></span>Explore</h4><div class="footer-links"><a href="about.html">About us</a><a href="services.html">Services</a><a href="careers.html">Careers</a><a href="blog.html">Team journal</a></div></div><div class="footer-column"><h4><span class="footer-icon" aria-hidden="true"><span class="footer-icon-fallback">○</span><lottie-player class="footer-lottie" src="assets/lottie-orbit.json" background="transparent" speed="1" loop autoplay></lottie-player></span>Services</h4><div class="footer-links"><a href="services.html#bpo">BPO full service</a><a href="services.html#seat">Seat lease</a><a href="services.html#recruitment">Recruitment</a><a href="services.html#talent">Talent sourcing</a></div></div><div class="footer-column"><h4><span class="footer-icon" aria-hidden="true"><span class="footer-icon-fallback">•••</span><lottie-player class="footer-lottie" src="assets/lottie-message.json" background="transparent" speed="1" loop autoplay></lottie-player></span>Get in touch</h4><div class="footer-links"><a href="tel:+639544423271">+63 954 442 3271</a><a href="mailto:info@ace-outsourcing.com">Client partnerships: info@ace-outsourcing.com</a><a href="mailto:hr@ace-outsourcing.com">Careers: hr@ace-outsourcing.com</a><a href="contact.html">Santa Rosa, Laguna</a></div></div></div><div class="footer-bottom"><span><span data-hidden-login-trigger>© ${new Date().getFullYear()} ACE Outsource Solutions.</span> Third-party marks belong to their respective owners.</span><span><a href="privacy.html">Privacy and cookies</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/aceoutsourcingsolutions" target="_blank" rel="noopener">Facebook</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/company/ace-outsource-solutions/" target="_blank" rel="noopener">LinkedIn</a></span></div></div></footer>`;
+ if(footer)footer.innerHTML=`<footer class="footer" id="site-footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a class="brand brand-light" href="index.html"><span class="footer-brand-mark"><img src="assets/ACE.png" alt=""></span><strong>ACE Outsource Solutions</strong><small>Expert Service, Beyond Borders</small></a><p>Flexible people and operations support for ambitious businesses, built in Laguna and delivered worldwide.</p></div><div class="footer-column"><h4><span class="footer-icon">${staticIcons.explore}</span>Explore</h4><div class="footer-links"><a href="about.html">About us</a><a href="services.html">Services</a><a href="careers.html">Careers</a><a href="blog.html">Team journal</a></div></div><div class="footer-column"><h4><span class="footer-icon">${staticIcons.services}</span>Services</h4><div class="footer-links"><a href="services.html#bpo">BPO full service</a><a href="services.html#seat">Seat lease</a><a href="services.html#recruitment">Recruitment</a><a href="services.html#talent">Talent sourcing</a></div></div><div class="footer-column"><h4><span class="footer-icon">${staticIcons.contact}</span>Get in touch</h4><div class="footer-links"><a href="tel:+639544423271">+63 954 442 3271</a><a href="mailto:info@ace-outsourcing.com">Client partnerships: info@ace-outsourcing.com</a><a href="mailto:hr@ace-outsourcing.com">Careers: hr@ace-outsourcing.com</a><a href="contact.html">Santa Rosa, Laguna</a></div></div></div><div class="footer-bottom"><span><span data-hidden-login-trigger>© ${new Date().getFullYear()} ACE Outsource Solutions.</span> Third-party marks belong to their respective owners.</span><span><a href="privacy.html">Privacy and cookies</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/aceoutsourcingsolutions" target="_blank" rel="noopener">Facebook</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/company/ace-outsource-solutions/" target="_blank" rel="noopener">LinkedIn</a></span></div></div></footer>`;
  if(footer?.id==='site-footer')footer.querySelector('.footer')?.removeAttribute('id');
+ const iconMotionReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const ensureLottiePlayer=()=>new Promise((resolve,reject)=>{if(customElements.get('lottie-player')){resolve();return}const existing=document.querySelector('script[data-local-lottie]');if(existing){customElements.whenDefined('lottie-player').then(resolve);return}const script=document.createElement('script');script.src='vendor/lottiefiles/lottie-player.js';script.async=true;script.dataset.localLottie='';script.addEventListener('load',()=>customElements.whenDefined('lottie-player').then(resolve),{once:true});script.addEventListener('error',reject,{once:true});document.head.append(script)});
+ const startLottieIcon=player=>ensureLottiePlayer().then(()=>{if(iconMotionReduced){player.seek('100%');return}player.seek('0%');player.play()}).catch(()=>{});
+ const lottieObserver=!iconMotionReduced&&'IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(entry=>{if(!entry.isIntersecting)return;startLottieIcon(entry.target);lottieObserver.unobserve(entry.target)}),{threshold:.35}):null;
+ const registerIconAnimation=root=>root.querySelectorAll('lottie-player.icon-animation, lottie-player.content-animation').forEach(player=>{if(lottieObserver)lottieObserver.observe(player);else startLottieIcon(player)});
+ registerIconAnimation(document);
  const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
- if(footer&&!motionPreference.matches){
-  let lottieRequested=false;
-  const revealLottie=()=>customElements.whenDefined('lottie-player').then(()=>document.documentElement.classList.add('lottie-ready'));
-  const loadLottie=()=>{
-   if(lottieRequested)return;
-   lottieRequested=true;
-   if(customElements.get('lottie-player')){revealLottie();return}
-   const lottieScript=document.createElement('script');
-   lottieScript.src='vendor/lottiefiles/lottie-player.js';
-   lottieScript.async=true;
-   lottieScript.addEventListener('load',revealLottie,{once:true});
-   document.head.append(lottieScript);
-  };
-  if('IntersectionObserver'in window){
-   const footerObserver=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){loadLottie();footerObserver.disconnect()}},{rootMargin:'320px 0px'});
-   footerObserver.observe(footer);
-  }else loadLottie();
- }
  const hiddenLoginTrigger=document.querySelector('[data-hidden-login-trigger]');
  let hiddenLoginClickQueue=Promise.resolve(),hiddenLoginNavigating=false;
  hiddenLoginTrigger?.addEventListener('click',()=>{
@@ -40,7 +53,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
  });
  const backToTop=document.createElement('button');
- backToTop.type='button';backToTop.className='back-to-top';backToTop.setAttribute('aria-label','Back to top');backToTop.innerHTML='<span aria-hidden="true">↑</span>';
+ backToTop.type='button';backToTop.className='back-to-top';backToTop.setAttribute('aria-label','Back to top');backToTop.innerHTML='<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>';
  document.body.append(backToTop);
  backToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:motionPreference.matches?'auto':'smooth'}));
  const syncBackToTop=()=>backToTop.classList.toggle('show',window.scrollY>520);
@@ -65,8 +78,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(publicPage&&!getConsentChoice()){
   const consentBanner=document.createElement('aside');
   consentBanner.className='cookie-consent';consentBanner.setAttribute('aria-label','Privacy choices');consentBanner.setAttribute('role','dialog');consentBanner.setAttribute('aria-live','polite');
-  consentBanner.innerHTML='<div class="cookie-consent-icon" aria-hidden="true">◎</div><div class="cookie-consent-copy"><span>Privacy choices</span><strong>Your visit, your choice.</strong><p>ACE uses a necessary preference cookie. Allowing optional services also enables the interactive Google Street View on our contact page.</p><a href="privacy.html">Read privacy details</a></div><div class="cookie-consent-actions"><button class="btn cookie-necessary" type="button" data-consent="necessary">Necessary only</button><button class="btn btn-dark" type="button" data-consent="all">Accept and show Street View</button></div>';
+  consentBanner.innerHTML=`<div class="cookie-consent-icon" aria-hidden="true">${staticIcons.privacy}</div><div class="cookie-consent-copy"><span>Privacy choices</span><strong>Your visit, your choice.</strong><p>ACE uses a necessary preference cookie. Allowing optional services also enables the interactive Google Street View on our contact page.</p><a href="privacy.html">Read privacy details</a></div><div class="cookie-consent-actions"><button class="btn cookie-necessary" type="button" data-consent="necessary">Necessary only</button><button class="btn btn-dark" type="button" data-consent="all">Accept and show Street View</button></div>`;
   document.body.append(consentBanner);
+  registerIconAnimation(consentBanner);
   consentBanner.querySelector('[data-consent="necessary"]')?.addEventListener('click',()=>{saveConsentChoice('necessary');consentBanner.remove()});
   consentBanner.querySelector('[data-consent="all"]')?.addEventListener('click',()=>{acceptGoogleServices();consentBanner.remove()});
  }
@@ -108,8 +122,18 @@ document.addEventListener('DOMContentLoaded',async()=>{
   }
  }
  const toggle=document.querySelector('.menu-toggle'),links=document.querySelector('.nav-links');
- toggle?.addEventListener('click',()=>{const open=links.classList.toggle('open');toggle.setAttribute('aria-expanded',open);document.body.classList.toggle('menu-open',open)});
- document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>{links?.classList.remove('open');document.body.classList.remove('menu-open')}));
+ let menuScrollPosition=0;
+ const setMobileMenu=open=>{
+  if(!toggle||!links)return;
+  const wasOpen=links.classList.contains('open');
+  if(open&&!wasOpen)menuScrollPosition=window.scrollY;
+  links.classList.toggle('open',open);toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close navigation':'Open navigation');document.documentElement.classList.toggle('menu-open',open);document.body.classList.toggle('menu-open',open);
+  if(!open&&wasOpen)window.requestAnimationFrame(()=>{const root=document.documentElement,previousBehavior=root.style.scrollBehavior;root.style.scrollBehavior='auto';window.scrollTo(0,menuScrollPosition);window.requestAnimationFrame(()=>{root.style.scrollBehavior=previousBehavior})});
+ };
+ toggle?.addEventListener('click',()=>setMobileMenu(!links?.classList.contains('open')));
+ document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>setMobileMenu(false)));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&links?.classList.contains('open')){setMobileMenu(false);toggle?.focus()}});
+ window.matchMedia('(min-width:901px)').addEventListener?.('change',event=>{if(event.matches)setMobileMenu(false)});
  const jobOpenings=[...document.querySelectorAll('.job-opening')],jobList=document.querySelector('.job-list'),wideJobs=window.matchMedia('(min-width:901px)');
  let selectedJob=jobOpenings.find(job=>job.open)||jobOpenings[0],jobPreview;
  if(jobList){jobPreview=document.createElement('aside');jobPreview.className='job-preview';jobPreview.setAttribute('aria-live','polite');jobPreview.setAttribute('aria-label','Selected job details');jobList.append(jobPreview)}
@@ -123,7 +147,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const journalModal=document.createElement('dialog');
   journalModal.className='journal-modal';
   journalModal.setAttribute('aria-label','Team Journal story');
-  journalModal.innerHTML='<button class="journal-modal-close" type="button" aria-label="Close story">&times;</button><div class="journal-modal-content" data-journal-modal-content></div>';
+  journalModal.innerHTML='<button class="journal-modal-close" type="button" aria-label="Close story"><span>Close</span><b aria-hidden="true">&times;</b></button><div class="journal-modal-content" data-journal-modal-content></div>';
   document.body.append(journalModal);
   const modalContent=journalModal.querySelector('[data-journal-modal-content]');
   const openJournal=entry=>{
@@ -131,10 +155,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
    if(!cover||!heading||!body||!modalContent)return;
    journalEntries.forEach(item=>item.open=false);
    modalContent.replaceChildren();
-   const media=document.createElement('div'),leadImage=cover.cloneNode(true),article=document.createElement('article'),title=document.createElement('h2');
+   const media=document.createElement('div'),leadImage=cover.cloneNode(true),hero=document.createElement('header'),headingPanel=document.createElement('div'),article=document.createElement('article'),title=document.createElement('h2'),kicker=document.createElement('span'),storyBody=body.cloneNode(true);
+   const summaryMeta=entry.querySelector('summary .article-meta')?.cloneNode(true);
    media.className='journal-modal-media';leadImage.removeAttribute('style');media.append(leadImage);
-   article.className='journal-modal-article';title.textContent=heading.textContent;article.append(title,body.cloneNode(true));
-   modalContent.append(media,article);
+   hero.className='journal-modal-hero';headingPanel.className='journal-modal-heading';headingPanel.classList.toggle('has-long-title',heading.textContent.trim().length>46);article.className='journal-modal-article';kicker.className='journal-modal-kicker';kicker.textContent='ACE Team Journal';title.textContent=heading.textContent;
+   headingPanel.append(kicker,title);if(summaryMeta)headingPanel.insertBefore(summaryMeta,title);hero.append(headingPanel,media);
+   storyBody.querySelector(':scope > .article-meta')?.remove();article.append(storyBody);
+   const storyIndex=journalEntries.indexOf(entry),previousEntry=journalEntries[(storyIndex-1+journalEntries.length)%journalEntries.length],nextEntry=journalEntries[(storyIndex+1)%journalEntries.length],storyNav=document.createElement('nav'),storyCount=document.createElement('span');
+   const makeStoryButton=(target,direction,label)=>{const button=document.createElement('button'),small=document.createElement('small'),strong=document.createElement('strong');button.type='button';button.className=`journal-story-nav-button ${direction}`;small.textContent=label;strong.textContent=target.querySelector('.journal-entry-heading strong')?.textContent||label;button.append(small,strong);button.addEventListener('click',()=>openJournal(target));return button};
+   storyNav.className='journal-modal-story-nav';storyNav.setAttribute('aria-label','More journal stories');storyCount.className='journal-modal-story-count';storyCount.textContent=`${String(storyIndex+1).padStart(2,'0')} / ${String(journalEntries.length).padStart(2,'0')}`;storyNav.append(makeStoryButton(previousEntry,'previous','Previous story'),storyCount,makeStoryButton(nextEntry,'next','Next story'));article.append(storyNav);
+   modalContent.append(hero,article);
    modalContent.querySelectorAll('.journal-gallery').forEach(gallery=>{
     const photos=[...gallery.querySelectorAll('img')];
     if(!photos.length)return;
@@ -148,7 +178,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     previous.addEventListener('click',()=>showPhoto(current-1));next.addEventListener('click',()=>showPhoto(current+1));
     gallery.append(previous,next,counter);showPhoto(0);
    });
-   journalModal.showModal();
+   if(!journalModal.open)journalModal.showModal();
    document.body.classList.add('modal-open');
    journalModal.scrollTop=0;
   };
@@ -159,6 +189,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
   journalModal.addEventListener('close',()=>document.body.classList.remove('modal-open'));
   if(location.hash){const linkedEntry=document.querySelector(location.hash);if(linkedEntry?.classList.contains('journal-entry'))openJournal(linkedEntry)}
  }
+ const serviceDetails=[...document.querySelectorAll('.service-detail')];
+ serviceDetails.forEach(card=>{
+  const action=card.querySelector('.service-modal-trigger, a.text-link');
+  if(!action)return;
+  const title=card.querySelector('h3')?.textContent?.trim()||'service details';
+  card.classList.add('service-detail-interactive');card.tabIndex=0;card.setAttribute('role',action.matches('a')?'link':'button');card.setAttribute('aria-label',`${action.matches('a')?'Contact ACE about':'View'} ${title}`);action.tabIndex=-1;
+  const activate=()=>action.click();
+  card.addEventListener('click',event=>{if(event.target.closest('a,button'))return;activate()});
+  card.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')return;event.preventDefault();activate()});
+ });
  document.querySelectorAll('[data-service-modal]').forEach(trigger=>trigger.addEventListener('click',()=>{const modal=document.getElementById(trigger.dataset.serviceModal);if(!modal)return;modal.showModal();modal.scrollTop=0;document.body.classList.add('modal-open')}));
  document.querySelectorAll('.service-modal').forEach(modal=>{modal.querySelector('[data-modal-close]')?.addEventListener('click',()=>modal.close());modal.addEventListener('click',event=>{if(event.target===modal)modal.close()});modal.addEventListener('close',()=>document.body.classList.remove('modal-open'))});
  const siteHeader=document.querySelector('.site-header');
