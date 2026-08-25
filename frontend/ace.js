@@ -143,6 +143,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
   chatShell.className='ace-chat-shell';
   chatShell.innerHTML=`<button class="ace-chat-launcher" type="button" aria-label="Open ACE website assistant" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5h14v10H9l-4 3v-13Z"/><path d="M8.5 9h7M8.5 12h5"/></svg><span>Ask ACE</span></button><section class="ace-chat-panel" role="dialog" aria-label="ACE website assistant" aria-modal="false" hidden><header><div><small>ACE website assistant</small><strong>How can we help?</strong></div><button class="ace-chat-close" type="button" aria-label="Close ACE website assistant">×</button></header><div class="ace-chat-log" role="log" aria-live="polite"><div class="ace-chat-message assistant">Hi! Choose a question below and I’ll point you to the right ACE information.</div></div><div class="ace-chat-questions" aria-label="Suggested questions">${aceFaqs.map((item,index)=>`<button type="button" data-chat-question="${index}">${item.question}</button>`).join('')}</div><footer>This assistant answers from information published on this website.</footer></section>`;
   document.body.append(chatShell);
+  chatShell.style.visibility='visible';
+  if(!getConsentChoice())chatShell.style.bottom=window.innerWidth<=640?'300px':'170px';
   const launcher=chatShell.querySelector('.ace-chat-launcher'),panel=chatShell.querySelector('.ace-chat-panel'),close=chatShell.querySelector('.ace-chat-close'),log=chatShell.querySelector('.ace-chat-log');
   const setChatOpen=open=>{panel.hidden=!open;launcher.setAttribute('aria-expanded',String(open));chatShell.classList.toggle('open',open);if(open)close.focus();else launcher.focus()};
   launcher.addEventListener('click',()=>setChatOpen(panel.hidden));
@@ -179,8 +181,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
   consentBanner.innerHTML=`<div class="cookie-consent-icon" aria-hidden="true">${staticIcons.privacy}</div><div class="cookie-consent-copy"><span>Privacy choices</span><strong>Your visit, your choice.</strong><p>ACE uses a necessary preference cookie. Allowing optional services also enables the interactive Google Street View on our contact page.</p><a href="privacy.html">Read privacy details</a></div><div class="cookie-consent-actions"><button class="btn cookie-necessary" type="button" data-consent="necessary">Necessary only</button><button class="btn btn-dark" type="button" data-consent="all">Accept and show Street View</button></div>`;
   document.body.append(consentBanner);
   registerIconAnimation(consentBanner);
-  consentBanner.querySelector('[data-consent="necessary"]')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();saveConsentChoice('necessary');consentBanner.remove()});
-  consentBanner.querySelector('[data-consent="all"]')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();acceptGoogleServices();consentBanner.remove()});
+  consentBanner.querySelector('[data-consent="necessary"]')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();saveConsentChoice('necessary');consentBanner.remove();document.querySelector('.ace-chat-shell')?.style.removeProperty('bottom')});
+  consentBanner.querySelector('[data-consent="all"]')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();acceptGoogleServices();consentBanner.remove();document.querySelector('.ace-chat-shell')?.style.removeProperty('bottom')});
  }
  const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
  const responsiveImages={
