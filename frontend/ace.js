@@ -1,5 +1,38 @@
 document.addEventListener('DOMContentLoaded',async()=>{
  const page=document.body.dataset.page||'';
+ const liquidHeadline=document.querySelector('.home-hero h1');
+ if(liquidHeadline&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  let liquidPoints=[],liquidFrame=0,lastLiquidPoint=null;
+  const paintLiquid=now=>{
+   liquidPoints=liquidPoints.filter(point=>now-point.born<point.life);
+   const layers=liquidPoints.map(point=>{
+    const progress=(now-point.born)/point.life,opacity=Math.max(0,1-progress),radius=point.radius*(1+progress*.22);
+    return `radial-gradient(circle ${radius.toFixed(1)}px at ${point.x.toFixed(2)}% ${point.y.toFixed(2)}%, rgba(225,253,255,${(.96*opacity).toFixed(3)}) 0 18%, rgba(85,222,233,${(.9*opacity).toFixed(3)}) 42%, rgba(13,151,171,${(.68*opacity).toFixed(3)}) 62%, rgba(255,255,255,0) 76%)`;
+   });
+   liquidHeadline.style.setProperty('--liquid-fill',[...layers,'linear-gradient(#fff,#fff)'].join(','));
+   if(liquidPoints.length)liquidFrame=requestAnimationFrame(paintLiquid);else liquidFrame=0;
+  };
+  const addLiquidPoint=(x,y,radius,life)=>{
+   liquidPoints.push({x,y,radius,life,born:performance.now()});
+   if(liquidPoints.length>28)liquidPoints.splice(0,liquidPoints.length-28);
+   if(!liquidFrame)liquidFrame=requestAnimationFrame(paintLiquid);
+  };
+  liquidHeadline.addEventListener('pointerenter',()=>liquidHeadline.classList.add('is-liquid-active'));
+  liquidHeadline.addEventListener('pointermove',event=>{
+   const box=liquidHeadline.getBoundingClientRect(),x=((event.clientX-box.left)/box.width)*100,y=((event.clientY-box.top)/box.height)*100;
+   addLiquidPoint(x,y,72,520);
+   if(lastLiquidPoint){
+    const dx=x-lastLiquidPoint.x,dy=y-lastLiquidPoint.y,distance=Math.hypot(dx,dy),steps=Math.min(4,Math.floor(distance/2.4));
+    for(let index=1;index<=steps;index++){
+     const ratio=index/(steps+1),jitter=(Math.random()-.5)*2.2;
+     addLiquidPoint(lastLiquidPoint.x+dx*ratio+jitter,lastLiquidPoint.y+dy*ratio+jitter,12+Math.random()*13,650+Math.random()*300);
+    }
+   }
+   if(Math.random()>.42)addLiquidPoint(x+(Math.random()-.5)*6,y+(Math.random()-.5)*7,5+Math.random()*8,720+Math.random()*380);
+   lastLiquidPoint={x,y};
+  });
+  liquidHeadline.addEventListener('pointerleave',()=>{liquidHeadline.classList.remove('is-liquid-active');lastLiquidPoint=null;liquidPoints=[];liquidHeadline.style.removeProperty('--liquid-fill')});
+ }
  try{if(page!=='home')sessionStorage.removeItem('aceInternalNavigation')}catch{}
  document.addEventListener('click',event=>{
   if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;

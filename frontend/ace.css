@@ -149,6 +149,7 @@ body.modal-open{overflow:hidden}
 .home-hero .container{padding-top:68px;padding-bottom:72px}
 .home-hero-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(440px,.98fr);gap:54px;align-items:center}
 .home-hero .hero-copy{max-width:670px}
+.home-hero h1{--liquid-x:50%;--liquid-y:50%}
 .home-hero .hero-copy h1{font-size:clamp(3rem,5vw,4.8rem)}
 .home-hero .hero-actions{margin:30px 0 40px}
 .home-hero-media{position:relative;isolation:isolate;padding:20px 0 36px}
@@ -377,8 +378,9 @@ html,body{max-width:100%;overflow-x:clip}
 .home-hero .home-hero-grid{position:relative;z-index:3;display:block;width:min(1400px,calc(100% - 40px));min-height:810px;padding:0!important}
 .home-hero .hero-copy{position:relative;z-index:4;width:47%;max-width:650px;padding:72px 0 188px}
 .home-hero .hero-copy h1{max-width:620px;margin-bottom:28px;font-size:clamp(4rem,5.1vw,5.75rem);line-height:.96;letter-spacing:-.055em}
-.home-hero .hero-copy h1 em{display:inline;color:#fff}.home-hero .hero-copy h1 em span{color:var(--accent)}
-.home-hero .hero-copy p{max-width:580px;color:#e0edf0;font-size:1.02rem;line-height:1.7}
+.home-hero .hero-copy{overflow:visible}.home-hero .hero-copy h1{display:inline-block;width:max-content;max-width:calc(100% + .3em);padding:0 .3em .18em 0;overflow:visible;color:#fff;background:none;text-shadow:none}.home-hero .hero-copy h1 em,.home-hero .hero-copy h1 span{color:inherit!important;background:none;text-shadow:none}.home-hero .hero-copy h1 .hero-title-line{display:inline-block;padding:0 .1em .08em 0;white-space:nowrap}.home-hero .hero-copy h1.is-liquid-active{color:transparent;background:var(--liquid-fill,linear-gradient(#fff,#fff));background-clip:text;-webkit-background-clip:text}.home-hero .hero-copy h1.is-liquid-active em,.home-hero .hero-copy h1.is-liquid-active span{color:transparent!important}
+@media(prefers-reduced-motion:reduce){.home-hero .hero-copy h1,.home-hero .hero-copy h1 em,.home-hero .hero-copy h1 em span{color:#fff!important;background:none;text-shadow:none}}
+.home-hero .hero-copy p{width:100%;max-width:580px;padding-right:18px;box-sizing:border-box;overflow:visible;color:#e0edf0;font-size:1.02rem;line-height:1.7}
 .home-hero .hero-actions{margin:28px 0 31px}.home-hero .btn-secondary{border-color:rgba(255,255,255,.55);background:rgba(4,31,43,.18);backdrop-filter:blur(8px)}
 .home-hero .trust-row{gap:25px;color:#fff}.home-hero .trust-row span:before{width:24px;height:24px;border:2px solid var(--accent);background:rgba(4,31,43,.56);color:#fff}
 .home-hero-media{position:absolute;z-index:1;top:0;right:calc((100vw - 100%)/-2);bottom:0;width:62vw;padding:0;isolation:isolate}
