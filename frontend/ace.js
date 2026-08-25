@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded',async()=>{
  const page=document.body.dataset.page||'';
+ if(document.documentElement.classList.contains('page-enter-pending'))requestAnimationFrame(()=>requestAnimationFrame(()=>{document.documentElement.classList.remove('page-enter-pending');document.documentElement.classList.add('page-enter-ready');window.setTimeout(()=>document.documentElement.classList.remove('page-enter-ready'),460)}));
+ window.addEventListener('pageshow',()=>document.documentElement.classList.remove('page-leaving'));
  const liquidHeadline=document.querySelector('.home-hero h1');
  if(liquidHeadline&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   let liquidPoints=[],liquidFrame=0,lastLiquidPoint=null;
@@ -34,13 +36,22 @@ document.addEventListener('DOMContentLoaded',async()=>{
   liquidHeadline.addEventListener('pointerleave',()=>{liquidHeadline.classList.remove('is-liquid-active');lastLiquidPoint=null;liquidPoints=[];liquidHeadline.style.removeProperty('--liquid-fill')});
  }
  try{if(page!=='home')sessionStorage.removeItem('aceInternalNavigation')}catch{}
+ let pageNavigationPending=false;
  document.addEventListener('click',event=>{
   if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
   const link=event.target.closest('a[href]');
   if(!link||link.target==='_blank'||link.hasAttribute('download'))return;
   try{
    const destination=new URL(link.href,window.location.href);
-   if(destination.origin===window.location.origin&&(destination.pathname!==window.location.pathname||destination.search!==window.location.search))sessionStorage.setItem('aceInternalNavigation','1');
+   if(destination.origin===window.location.origin&&(destination.pathname!==window.location.pathname||destination.search!==window.location.search)){
+    event.preventDefault();
+    if(pageNavigationPending)return;
+    pageNavigationPending=true;
+    sessionStorage.setItem('aceInternalNavigation','1');
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){window.location.assign(destination.href);return}
+    document.documentElement.classList.add('page-leaving');
+    window.setTimeout(()=>window.location.assign(destination.href),250);
+   }
   }catch{}
  },true);
  const openingSplash=document.querySelector('[data-opening-splash]');
