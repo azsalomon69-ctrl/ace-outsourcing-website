@@ -124,39 +124,55 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(getConsentChoice()==='all')loadStreetView();
  const publicPage=!['login','admin'].includes(page);
  if(publicPage){
-  const aceFaqs=[
-   {question:'How do I get started as a client?',answer:'Tell ACE what support you need, your preferred team size, and your biggest operational challenge. Start through the <a href="contact.html">Contact page</a> or email <a href="mailto:info@ace-outsourcing.com">info@ace-outsourcing.com</a>.'},
-   {question:'Can ACE build and manage my offshore team?',answer:'Yes. ACE BPO Full Service can support team setup, onboarding, day-to-day management, performance monitoring, offboarding, and Employer of Record needs in the Philippines.'},
-   {question:'How can I contact ACE?',answer:'For client partnerships, email <a href="mailto:info@ace-outsourcing.com">info@ace-outsourcing.com</a> or call <a href="tel:+639544423271">+63 954 442 3271</a>. Published calling hours are Monday to Friday, 11:00 AM to 12:00 AM.'},
-   {question:'What services does ACE offer?',answer:'ACE offers BPO full service, seat lease services, recruitment services, and talent sourcing. You can compare them on the <a href="services.html">Services page</a>.'},
-   {question:'How can ACE help with recruitment?',answer:'ACE sources, screens, and places candidates based on the role, goals, and working culture of your business. Support is available for temporary, permanent, and executive hiring.'},
-   {question:'What comes with a seat lease?',answer:'Seat leasing includes ready workstations, ergonomic furniture, high-speed internet, VoIP phone systems, backup power, meeting rooms, shared amenities, secure access, and on-site technical support. Flexible lease terms are available.'},
-   {question:'Are ACE operations available 24/7?',answer:'The website describes ACE operations as 24/7 ready. Direct phone hours are listed separately as Monday to Friday, 11:00 AM to 12:00 AM.'},
-   {question:'How do I apply for a job?',answer:'View current roles on the <a href="careers.html">Careers page</a>. For applications and recruitment questions, email <a href="mailto:hr@ace-outsourcing.com">hr@ace-outsourcing.com</a>.'},
-   {question:'What jobs are currently available?',answer:'ACE keeps its current openings and full role details on the <a href="careers.html">Careers page</a>. Select a position there to review its responsibilities and qualifications.'},
-   {question:'Where can I send my CV?',answer:'Send your CV and application questions to <a href="mailto:hr@ace-outsourcing.com">hr@ace-outsourcing.com</a>. The Careers page notes that online application submission is still being prepared.'},
-   {question:'Where is the ACE office?',answer:'ACE is at Unit 2LS6, 2F Paseo 3A Building, Paseo de Sta. Rosa, Barangay Don Jose, Santa Rosa, Laguna 4026.'},
-   {question:'What is talent sourcing?',answer:'Talent sourcing helps you add specialist or project-based expertise when you need extra capability without building a permanent role immediately.'},
-   {question:'Where can I see life at ACE?',answer:'The <a href="blog.html">Team Journal</a> shares team celebrations, recognition, milestones, and everyday moments from company life.'}
-  ];
+  const aceFaqs={
+   client:[
+    {question:'How do I get started as a client?',answer:'Tell ACE what support you need, your preferred team size, and your biggest operational challenge. Start through the <a href="contact.html">Contact page</a> or email <a href="mailto:info@ace-outsourcing.com">info@ace-outsourcing.com</a>.'},
+    {question:'How can I contact ACE?',answer:'For client partnerships, email <a href="mailto:info@ace-outsourcing.com">info@ace-outsourcing.com</a> or call <a href="tel:+639544423271">+63 954 442 3271</a>. Published calling hours are Monday to Friday, 11:00 AM to 12:00 AM.'},
+    {question:'What services does ACE offer?',answer:'ACE offers BPO full service, seat lease services, recruitment services, and talent sourcing. You can compare them on the <a href="services.html">Services page</a>.'},
+    {question:'How can ACE help with recruitment?',answer:'ACE sources, screens, and places candidates based on the role, goals, and working culture of your business. Support is available for temporary, permanent, and executive hiring.'},
+    {question:'What comes with a seat lease?',answer:'Seat leasing includes ready workstations, ergonomic furniture, high-speed internet, VoIP phone systems, backup power, meeting rooms, shared amenities, secure access, and on-site technical support. Flexible lease terms are available.'},
+    {question:'Are ACE operations available 24/7?',answer:'The website describes ACE operations as 24/7 ready. Direct phone hours are listed separately as Monday to Friday, 11:00 AM to 12:00 AM.'}
+   ],
+   applicant:[
+    {question:'How do I apply for a job?',answer:'View current roles on the <a href="careers.html">Careers page</a>. For applications and recruitment questions, email <a href="mailto:hr@ace-outsourcing.com">hr@ace-outsourcing.com</a>.'},
+    {question:'What jobs are currently available?',answer:'ACE keeps its current openings and full role details on the <a href="careers.html">Careers page</a>. Select a position there to review its responsibilities and qualifications.'},
+    {question:'Where can I send my CV?',answer:'Send your CV and application questions to <a href="mailto:hr@ace-outsourcing.com">hr@ace-outsourcing.com</a>. The Careers page notes that online application submission is still being prepared.'},
+    {question:'Where is the ACE office?',answer:'ACE is at Unit 2LS6, 2F Paseo 3A Building, Paseo de Sta. Rosa, Barangay Don Jose, Santa Rosa, Laguna 4026.'},
+    {question:'What is talent sourcing?',answer:'Talent sourcing helps you add specialist or project-based expertise when you need extra capability without building a permanent role immediately.'},
+    {question:'Where can I see life at ACE?',answer:'The <a href="blog.html">Team Journal</a> shares team celebrations, recognition, milestones, and everyday moments from company life.'}
+   ]
+  };
+  const audienceChoices='<button type="button" data-chat-audience="client">I’m a client</button><button type="button" data-chat-audience="applicant">I’m an applicant</button>';
   const chatShell=document.createElement('div');
   chatShell.className='ace-chat-shell';
-  chatShell.innerHTML=`<button class="ace-chat-launcher" type="button" aria-label="Open ACE website assistant" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5h14v10H9l-4 3v-13Z"/><path d="M8.5 9h7M8.5 12h5"/></svg><span>Ask ACE</span></button><section class="ace-chat-panel" role="dialog" aria-label="ACE website assistant" aria-modal="false" hidden><header><div><small>ACE website assistant</small><strong>How can we help?</strong></div><button class="ace-chat-close" type="button" aria-label="Close ACE website assistant">×</button></header><div class="ace-chat-log" role="log" aria-live="polite"><div class="ace-chat-message assistant">Hi! Choose a question below and I’ll point you to the right ACE information.</div></div><div class="ace-chat-questions" aria-label="Suggested questions">${aceFaqs.map((item,index)=>`<button type="button" data-chat-question="${index}">${item.question}</button>`).join('')}</div><footer>This assistant answers from information published on this website.</footer></section>`;
+  chatShell.innerHTML=`<button class="ace-chat-launcher" type="button" aria-label="Open ACE website assistant" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5h14v10H9l-4 3v-13Z"/><path d="M8.5 9h7M8.5 12h5"/></svg><span>Ask ACE</span></button><section class="ace-chat-panel" role="dialog" aria-label="ACE website assistant" aria-modal="false" hidden><header><div><small>ACE website assistant</small><strong>How can we help?</strong></div><button class="ace-chat-close" type="button" aria-label="Close ACE website assistant">×</button></header><div class="ace-chat-log" role="log" aria-live="polite"><div class="ace-chat-message assistant">Hi! Before we begin, are you a client or an applicant?</div></div><div class="ace-chat-questions" aria-label="Choose who you are">${audienceChoices}</div><footer>This assistant answers from information published on this website.</footer></section>`;
   document.body.append(chatShell);
   chatShell.style.visibility='visible';
   if(!getConsentChoice())chatShell.style.bottom=window.innerWidth<=640?'300px':'170px';
-  const launcher=chatShell.querySelector('.ace-chat-launcher'),panel=chatShell.querySelector('.ace-chat-panel'),close=chatShell.querySelector('.ace-chat-close'),log=chatShell.querySelector('.ace-chat-log');
+  const launcher=chatShell.querySelector('.ace-chat-launcher'),panel=chatShell.querySelector('.ace-chat-panel'),close=chatShell.querySelector('.ace-chat-close'),log=chatShell.querySelector('.ace-chat-log'),questions=chatShell.querySelector('.ace-chat-questions');
+  let chatBusy=false;
+  const resetChat=()=>{chatBusy=false;log.innerHTML='<div class="ace-chat-message assistant">Hi! Before we begin, are you a client or an applicant?</div>';questions.setAttribute('aria-label','Choose who you are');questions.innerHTML=audienceChoices};
   const setChatOpen=open=>{panel.hidden=!open;launcher.setAttribute('aria-expanded',String(open));chatShell.classList.toggle('open',open);if(open)close.focus();else launcher.focus()};
-  launcher.addEventListener('click',()=>setChatOpen(panel.hidden));
+  launcher.addEventListener('click',()=>{const opening=panel.hidden;if(opening)resetChat();setChatOpen(opening)});
   close.addEventListener('click',()=>setChatOpen(false));
   chatShell.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden)setChatOpen(false)});
-  const questionButtons=[...chatShell.querySelectorAll('[data-chat-question]')];
-  let chatBusy=false;
   const scrollChat=()=>{log.scrollTop=log.scrollHeight};
-  questionButtons.forEach(button=>button.addEventListener('click',()=>{
+  const setQuestionControlsDisabled=disabled=>questions.querySelectorAll('button').forEach(control=>{control.disabled=disabled});
+  questions.addEventListener('click',event=>{
+   const button=event.target.closest('button');
+   if(!button||chatBusy)return;
+   const audience=button.dataset.chatAudience;
+   if(audience){
+    const audienceLabel=audience==='client'?'client':'applicant';
+    log.insertAdjacentHTML('beforeend',`<div class="ace-chat-message visitor">I’m a ${audienceLabel}.</div><div class="ace-chat-message assistant">Thanks. Choose a question below.</div>`);
+    questions.setAttribute('aria-label',`${audienceLabel} questions`);
+    questions.innerHTML=aceFaqs[audience].map((item,index)=>`<button type="button" data-chat-question="${audience}:${index}">${item.question}</button>`).join('');
+    scrollChat();return;
+   }
+   if(!button.dataset.chatQuestion)return;
    if(chatBusy)return;
-   chatBusy=true;questionButtons.forEach(item=>item.disabled=true);
-   const item=aceFaqs[Number(button.dataset.chatQuestion)];
+   chatBusy=true;setQuestionControlsDisabled(true);
+   const [questionAudience,questionIndex]=button.dataset.chatQuestion.split(':'),item=aceFaqs[questionAudience][Number(questionIndex)];
    log.insertAdjacentHTML('beforeend',`<div class="ace-chat-message visitor">${item.question}</div><div class="ace-chat-message assistant ace-chat-typing" aria-label="ACE assistant is typing"><span></span><span></span><span></span></div>`);
    scrollChat();
    const typing=log.lastElementChild;
@@ -164,16 +180,16 @@ document.addEventListener('DOMContentLoaded',async()=>{
     typing.remove();
     const response=document.createElement('div');response.className='ace-chat-message assistant ace-chat-stream';log.append(response);
     const parser=document.createElement('div');parser.innerHTML=item.answer;const plainAnswer=parser.textContent||'';
-    if(motionPreference.matches){response.classList.remove('ace-chat-stream');response.innerHTML=item.answer;chatBusy=false;questionButtons.forEach(control=>control.disabled=false);scrollChat();return}
+    if(motionPreference.matches){response.classList.remove('ace-chat-stream');response.innerHTML=item.answer;chatBusy=false;setQuestionControlsDisabled(false);scrollChat();return}
     let character=0;
     const streamAnswer=()=>{
      character=Math.min(plainAnswer.length,character+2);response.textContent=plainAnswer.slice(0,character);scrollChat();
      if(character<plainAnswer.length){requestAnimationFrame(streamAnswer);return}
-     response.classList.remove('ace-chat-stream');response.innerHTML=item.answer;chatBusy=false;questionButtons.forEach(control=>control.disabled=false);scrollChat();
+     response.classList.remove('ace-chat-stream');response.innerHTML=item.answer;chatBusy=false;setQuestionControlsDisabled(false);scrollChat();
     };
     requestAnimationFrame(streamAnswer);
    },650);
-  }));
+  });
  }
  if(publicPage&&!getConsentChoice()){
   const consentBanner=document.createElement('aside');
