@@ -339,11 +339,15 @@ html,body{max-width:100%;overflow-x:clip}
 @media(hover:hover) and (pointer:fine){.home-service-card:hover:after{width:68px;height:68px;opacity:.82}.home-service-card:hover{box-shadow:0 22px 50px rgba(5,47,56,.16)}}
 .service-card:not(:has(a)):hover{transform:none;border-color:var(--line);box-shadow:var(--shadow-xs)}
 
-.testimonial{min-height:650px;background-color:#052f38;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px}
+.testimonial{min-height:0;padding:72px 0;background-color:#052f38;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px}
 .testimonial:before{width:360px;height:360px;left:-178px;bottom:-214px;border-width:52px;border-radius:22px;transform:rotate(16deg);animation:none}
-.testimonial-layout{min-height:470px;align-items:center}
-.quote-card{height:440px;min-height:440px}
-.quote-text{display:flex;min-height:158px;max-height:170px;align-items:center;margin:10px 0 24px;overflow:auto;scrollbar-width:thin}
+.testimonial-layout{min-height:400px;align-items:center}
+.quote-card{height:400px;min-height:400px;max-width:700px;padding:30px 34px}
+.quote-card .quote-mark{height:34px;margin-top:18px;font-size:4.4rem}
+.quote-text{display:block;min-height:0;max-height:none;margin:6px 0 18px;overflow:visible;font-size:clamp(.92rem,1vw,1.02rem);line-height:1.5}
+.quote-card .quote-footer{padding-top:18px}
+.quote-card .quote-logo{width:58px;height:58px}
+.quote-card .quote-controls button{width:40px;height:40px}
 .quote-mark{margin-top:28px}
 
 /* Footer inspired by a working blueprint, not an animated gradient */
@@ -361,7 +365,7 @@ html,body{max-width:100%;overflow-x:clip}
 .footer-column{position:relative}
 .footer-column:before{content:"";position:absolute;top:-18px;left:0;width:34px;height:2px;background:#176fa8}
 
-@media(max-width:1000px){.testimonial{min-height:0}.testimonial-layout{min-height:0}.quote-card{height:440px}.footer-orbit-a{right:-40px}}
+@media(max-width:1000px){.testimonial{min-height:0}.testimonial-layout{min-height:0}.quote-card{height:auto;min-height:400px}.footer-orbit-a{right:-40px}}
 @media(max-width:640px){.home-hero:before{background-size:38px 38px}.home-hero:after{left:28%;height:52%;opacity:.55}.home-hero .hero-copy:before{font-size:.56rem}.home-about:before,.home-journal-section:before{display:none}.testimonial{background-size:46px 46px}.testimonial-layout{min-height:0}.quote-card{height:auto;min-height:440px}.quote-text{min-height:150px;max-height:none;overflow:visible}.footer-orbit-a{right:-100px;top:18px}.footer-glow{display:none}}
 
 .admin-migration{display:flex;align-items:center;justify-content:space-between;gap:32px;margin-bottom:28px;padding:28px;border:1px solid #59c7dc;border-radius:22px;background:#eafaff;box-shadow:0 16px 45px rgba(5,47,56,.08)}.admin-migration[hidden]{display:none}.admin-migration h2{margin:8px 0;font-size:1.55rem}.admin-migration p{max-width:780px;margin:0 0 14px;color:#286173}.admin-migration label{display:block;margin-top:8px;font-size:.82rem;font-weight:700}@media(max-width:760px){.admin-migration{align-items:flex-start;flex-direction:column}}
