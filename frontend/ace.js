@@ -345,9 +345,15 @@ document.addEventListener('DOMContentLoaded',async()=>{
  const syncHeaderDepth=()=>siteHeader?.classList.toggle('is-scrolled',window.scrollY>10);
  window.addEventListener('scroll',syncHeaderDepth,{passive:true});syncHeaderDepth();
  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const revealItems=[...document.querySelectorAll('.home-about-grid,.home-service-card,.post,.testimonial-layout,.value,.role-card,.article-card,.fit-card,.service-detail,.step,.job-opening,.contact-card,.office-location,.journal-story-card,.journal-entry,.story-note,.form-card')];
+ const revealItems=[...document.querySelectorAll('.home-about-grid,.section-head,.home-service-card,.post,.testimonial-layout,.value,.role-card,.article-card,.fit-card,.service-detail,.step,.job-opening,.contact-card,.office-location,.journal-story-card,.journal-entry,.story-note,.form-card')];
  if(!reduceMotion&&'IntersectionObserver'in window){
-  revealItems.forEach((item,index)=>{item.classList.add('motion-reveal');item.style.setProperty('--reveal-delay',`${Math.min(index%4*45,135)}ms`)});
+  let sectionHeadingIndex=0;
+  revealItems.forEach((item,index)=>{
+   item.classList.add('motion-reveal');
+   item.style.setProperty('--reveal-delay',`${Math.min(index%4*45,135)}ms`);
+   const directionIndex=item.matches('.section-head')?sectionHeadingIndex++:index;
+   item.style.setProperty('--reveal-x',directionIndex%2===0?'-72px':'72px');
+  });
   const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(!entry.isIntersecting)return;entry.target.classList.add('is-visible');revealObserver.unobserve(entry.target)}),{threshold:.12,rootMargin:'0px 0px -36px'});
   revealItems.forEach(item=>revealObserver.observe(item));
  }else revealItems.forEach(item=>item.classList.add('is-visible'));

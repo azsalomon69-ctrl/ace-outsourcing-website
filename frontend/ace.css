@@ -220,8 +220,8 @@ h3{line-height:1.16}
 @keyframes ace-hero-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes ace-note-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes ace-orbit-float{from{transform:translate3d(0,0,0) rotate(0)}to{transform:translate3d(-10px,8px,0) rotate(2deg)}}
-.motion-reveal{opacity:0;transform:translate3d(0,18px,0) scale(.985);transition:opacity 360ms var(--ease-out) var(--reveal-delay,0ms),transform 360ms var(--ease-out) var(--reveal-delay,0ms);will-change:opacity,transform}
-.motion-reveal.is-visible{opacity:1;transform:translate3d(0,0,0) scale(1)}
+.motion-reveal{transform:translate3d(var(--reveal-x,-72px),0,0);transition:transform 520ms var(--ease-out) var(--reveal-delay,0ms);will-change:transform}
+.motion-reveal.is-visible{transform:translate3d(0,0,0)}
 dialog[open].journal-modal,dialog[open].service-modal,dialog[open].admin-editor{animation:ace-dialog-in 240ms var(--ease-out)}
 dialog[open]::backdrop{animation:ace-backdrop-in 200ms ease-out}
 @keyframes ace-dialog-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
