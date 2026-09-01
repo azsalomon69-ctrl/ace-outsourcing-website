@@ -222,7 +222,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
  ratingValues.forEach(value=>value.textContent=average.toFixed(1));if(ratingStars)ratingStars.textContent='★'.repeat(Math.round(average))+'☆'.repeat(5-Math.round(average));
  document.querySelector('[data-quote-next]')?.addEventListener('click',()=>{quoteIndex=(quoteIndex+1)%quotes.length;showQuote()});
  document.querySelector('[data-quote-prev]')?.addEventListener('click',()=>{quoteIndex=(quoteIndex-1+quotes.length)%quotes.length;showQuote()});showQuote();
- const cmsContent=window.ACECMS?await ACECMS.getContent():null;
+ let cmsContent=null,cmsLoadError=null;
+ if(window.ACECMS){
+  try{cmsContent=await ACECMS.getContent({allowFallback:page!=='careers'})}
+  catch(error){cmsLoadError=error;console.warn('Website content could not be loaded:',error.message)}
+ }
  if(cmsContent){
   const homeJournal=document.querySelector('.journal-grid');
   if(homeJournal)homeJournal.innerHTML=cmsContent.blogs.slice(0,3).map(post=>`<article class="post">${responsivePostImage(post.cover,post.title)}<small>${escapeHtml(post.category)}</small><h3>${escapeHtml(post.title)}</h3><a class="text-link" href="blog.html#${escapeHtml(post.id)}">Read story <span>→</span></a></article>`).join('');
@@ -234,8 +238,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
    const list=(items,label)=>items?.length?`<div><h4>${label}</h4><ul>${items.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul></div>`:'';
    managedJobs.innerHTML=(cmsContent.jobs||[]).map((job,index)=>{const applyAttributes=job.applicationUrl?`href="${escapeHtml(job.applicationUrl)}" target="_blank" rel="noopener noreferrer"`:'href="#apply"';return `<details class="job-opening" data-role="${escapeHtml(job.category)}" ${index===0?'open':''}><summary><span><small>${escapeHtml(job.department)} · ${escapeHtml(job.employmentType)}${job.location?` · ${escapeHtml(job.location)}`:''}</small><strong>${escapeHtml(job.title)}</strong><em class="job-priority job-priority-${escapeHtml(job.priority)}">${escapeHtml(priorityLabels[job.priority]||priorityLabels.open)}</em></span><b>View role</b></summary><div class="job-content"><span class="job-priority job-priority-${escapeHtml(job.priority)}">${escapeHtml(priorityLabels[job.priority]||priorityLabels.open)}</span><h3>${escapeHtml(job.title)}</h3><p class="job-lead">${escapeHtml(job.summary)}</p>${job.responsibilities?.length||job.qualifications?.length?`<div class="job-columns">${list(job.responsibilities,'Key responsibilities')}${list(job.qualifications,'Qualifications')}</div>`:''}<a class="btn btn-dark" ${applyAttributes}>Apply for this role <span>→</span></a></div></details>`}).join('')||'<div class="admin-empty">There are no open positions right now. Please check again soon.</div>';
    const roleSelect=document.querySelector('#career-role');
-   if(roleSelect)roleSelect.innerHTML=(cmsContent.jobs||[]).map(job=>`<option>${escapeHtml(job.title)}</option>`).join('')+'<option>Other / General application</option>';
+   if(roleSelect){
+    roleSelect.innerHTML=(cmsContent.jobs||[]).map(job=>`<option>${escapeHtml(job.title)}</option>`).join('')+'<option>Other / General application</option>';
+    roleSelect.disabled=false;
+   }
+   managedJobs.setAttribute('aria-busy','false');
   }
+ }
+ const managedJobs=document.querySelector('[data-managed-jobs]');
+ if(page==='careers'&&managedJobs&&cmsLoadError){
+  managedJobs.innerHTML='<div class="jobs-load-error" role="status"><strong>Roles are temporarily unavailable.</strong><span>Please refresh the page to try again.</span></div>';
+  managedJobs.setAttribute('aria-busy','false');
  }
  const toggle=document.querySelector('.menu-toggle'),links=document.querySelector('.nav-links');
  let menuScrollPosition=0;
@@ -252,7 +265,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  window.matchMedia('(min-width:901px)').addEventListener?.('change',event=>{if(event.matches)setMobileMenu(false)});
  const jobOpenings=[...document.querySelectorAll('.job-opening')],jobList=document.querySelector('.job-list'),wideJobs=window.matchMedia('(min-width:901px)');
  let selectedJob=jobOpenings.find(job=>job.open)||jobOpenings[0],jobPreview;
- if(jobList){jobPreview=document.createElement('aside');jobPreview.className='job-preview';jobPreview.setAttribute('aria-live','polite');jobPreview.setAttribute('aria-label','Selected job details');jobList.append(jobPreview)}
+ if(jobList&&jobOpenings.length){jobPreview=document.createElement('aside');jobPreview.className='job-preview';jobPreview.setAttribute('aria-live','polite');jobPreview.setAttribute('aria-label','Selected job details');jobList.append(jobPreview)}
  function showJob(job){if(!job||!jobPreview)return;selectedJob=job;jobOpenings.forEach(item=>{item.open=false;item.classList.toggle('selected',item===job)});jobPreview.innerHTML=job.querySelector('.job-content')?.innerHTML||'';jobPreview.hidden=false;jobPreview.scrollTop=0}
  function syncJobLayout(){if(!jobPreview)return;if(wideJobs.matches){const visibleSelected=selectedJob&&!selectedJob.classList.contains('hidden')?selectedJob:jobOpenings.find(job=>!job.classList.contains('hidden'));showJob(visibleSelected)}else{jobPreview.hidden=true;jobOpenings.forEach(job=>job.classList.remove('selected'))}}
  jobOpenings.forEach(opening=>{opening.addEventListener('toggle',()=>{if(wideJobs.matches||!opening.open)return;jobOpenings.forEach(other=>{if(other!==opening)other.open=false})});opening.querySelector('summary')?.addEventListener('click',event=>{if(!wideJobs.matches)return;event.preventDefault();showJob(opening)})});

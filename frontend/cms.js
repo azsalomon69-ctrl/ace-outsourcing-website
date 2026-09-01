@@ -51,7 +51,14 @@
   };
   window.ACECMS={
     defaults:clone(defaults),uid,apiBase,isConfigured:Boolean(apiBase),
-    async getContent(){try{return clone(await request('/content'))}catch(error){console.warn('Using bundled website content:',error.message);return clone(defaults)}},
+    async getContent({allowFallback=true}={}){
+      try{return clone(await request('/content',{cache:'no-store'}))}
+      catch(error){
+        if(!allowFallback)throw error;
+        console.warn('Using bundled website content:',error.message);
+        return clone(defaults);
+      }
+    },
     async getAdminContent(){return clone(await request('/admin/content'))},
     async saveContent(content){return request('/admin/content',{method:'PUT',body:JSON.stringify(clone(content))})},
     async resetContent(){return request('/admin/content',{method:'PUT',body:JSON.stringify(clone(defaults))})},
